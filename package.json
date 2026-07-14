@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "scripts:create-post": "npx tsx src/scripts/create-post.ts",
+    "scripts:import-rss": "npx tsx src/scripts/import-rss.ts",
+    "scripts:generate-sitemap": "npx tsx src/scripts/generate-sitemap.ts",
+    "scripts:check-links": "npx tsx src/scripts/check-links.ts",
+    "scripts:backup": "npx tsx src/scripts/backup.ts"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
