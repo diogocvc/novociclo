@@ -21,13 +21,12 @@ export default function Home() {
       <CountdownBanner />
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
-        {!hasNewsToday && chapters.length > 0 && (
+        {!hasNewsToday && chapters.length > 0 ? (
           <NoNewsToday
             latestDate={new Date(chapters[0].data)}
             latestSlug={chapters[0].slug}
           />
-        )}
-        {chapter ? (
+        ) : chapter ? (
           <ChapterContent chapter={chapter} />
         ) : (
           <p className="text-gray-medium">Nenhum capítulo publicado ainda.</p>
