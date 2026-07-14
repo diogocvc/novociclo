@@ -21,9 +21,9 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Projeto:** Novo Ciclo
 
-**Versão:** 0.1.0
+**Versão:** 0.2.0
 
-**Status Geral:** Planejamento
+**Status Geral:** Em Desenvolvimento
 
 **Última atualização:** 14/07/2026
 
@@ -31,25 +31,27 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 # Resumo Executivo
 
-A documentação estrutural do projeto foi concluída.
+A documentação estrutural do projeto foi concluída e o desenvolvimento do código foi iniciado.
 
-Todos os documentos de visão, arquitetura, dados, design e automação estão finalizados e revisados.
+O projeto Next.js + TypeScript + Tailwind v4 está configurado e compilando. A estrutura de diretórios, tipos compartilhados, configurações base, design system e componentes principais de layout foram implementados.
 
-O projeto está pronto para iniciar a implementação do código.
+O sistema de conteúdo em MDX está funcional, os scripts de automação estão criados, e a arquitetura dos 8 agentes editoriais está estabelecida com implementações base.
+
+O deploy está no ar via Vercel. O projeto está apto para receber conteúdo real e iniciar a integração com APIs de IA.
 
 ---
 
 # Fase Atual
 
-## Documentação Concluída
+## Desenvolvimento — Fase 1
 
 Status:
 
-✅ Documentação completa
+🔵 Em andamento
 
 Objetivo:
 
-Toda a documentação estrutural foi concluída. O projeto está apto para iniciar a implementação.
+Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 
 ---
 
@@ -72,73 +74,51 @@ Toda a documentação estrutural foi concluída. O projeto está apto para inici
 | Design System           | ✅ Concluído     |
 | Automação               | ✅ Concluído     |
 | Deploy                  | ✅ Concluído     |
-| Desenvolvimento         | ⏳ Não iniciado  |
+| **Setup Next.js**       | ✅ Concluído     |
+| **Componentes Layout**  | ✅ Concluído     |
+| **Página Home**         | ✅ Concluído     |
+| **Página Capítulo**     | ✅ Concluído     |
+| **Sistema MDX**         | ✅ Concluído     |
+| **Scripts Automação**   | ✅ Concluído     |
+| **Agentes (base)**      | ✅ Concluído     |
+| **Pipeline Diário**     | ✅ Concluído     |
+| **Deploy Vercel**       | ✅ Concluído     |
 | Testes                  | ⏳ Não iniciado  |
 
 ---
 
-# Documentação Existente
+# Estrutura do Projeto
 
-## Core
-
-* MANIFEST.md
-* PROJECT_STATE.md
-* DECISIONS.md
-
-## Produto
-
-* Design-Vision.md (00-product-vision)
-* PRD-Novo-Ciclo.md (01-prd)
-* Especificacao_Interface_Novo_Ciclo.md
-
-## Arquitetura
-
-* 02-Arquitetura-do-Sistema.md (02-system-architecture)
-* 03-Arquitetura-dos-Agentes.md (03-agents)
-* 04-Modelo-de-Dados-e-Regras-de-Negocio.md (04-data-model)
-* 05-Estrutura-do-Projeto.md (05-project-structure)
-
-## Desenvolvimento
-
-* 06-editorial-guide.md
-* 07-prompts.md
-* 08-ui.md
-* 09-design-system.md
-* 10-automation.md
-* 11-deployment.md
-
----
-
-# Decisões Arquiteturais Ativas
-
-Atualmente o projeto segue as decisões registradas em DECISIONS.md.
-
-Até o momento, nenhuma decisão foi substituída ou descontinuada.
-
----
-
-# Próxima Etapa
-
-## Inicialização do Projeto
-
-Status:
-
-🔵 Pronto para iniciar
-
-Objetivo:
-
-Configurar o ambiente de desenvolvimento e iniciar a implementação do código.
-
-Após a conclusão de toda a documentação estrutural, o projeto está pronto para a fase de desenvolvimento.
-
-Atividades da próxima etapa:
-
-* Inicializar projeto Next.js com TypeScript e Tailwind.
-* Configurar estrutura de pastas conforme 05-Estrutura-do-Projeto.md.
-* Implementar componentes de UI seguindo 08-ui.md e 09-design-system.md.
-* Criar tipos compartilhados conforme 04-Modelo-de-Dados-e-Regras-de-Negocio.md.
-* Configurar GitHub Actions para CI/CD.
-* Configurar deploy na Vercel.
+```
+novo-ciclo/
+├── app/                    → Next.js App Router
+│   ├── page.tsx            → Home (último capítulo)
+│   └── [ano]/[mes]/[dia]/  → Capítulo individual
+├── components/
+│   ├── layout/             → Header, Footer, CountdownBanner
+│   ├── home/               → WeeklyNavigation, WeekArchive
+│   └── chapter/            → ChapterContent, NewsCard
+├── content/                → Capítulos em MDX
+│   └── 2026/07/            → 13.mdx, 14.mdx
+├── config/                 → cycle.ts, sources.ts, categories.ts
+├── lib/                    → date.ts, countdown.ts, reading-time.ts, content.ts
+├── types/                  → index.ts (News, Event, Chapter, Source, Category)
+├── data/                   → mock-chapters.ts, mock-news.ts
+├── agents/                 → 8 agentes editoriais
+│   ├── base.ts
+│   ├── researcher/
+│   ├── curator/
+│   ├── editor/
+│   ├── writer/
+│   ├── reviewer/
+│   ├── publisher/
+│   ├── newsletter/
+│   └── seo/
+├── automation/             → daily-pipeline.ts
+├── scripts/                → create-post, import-rss, generate-sitemap, backup
+├── .github/workflows/      → test.yml, deploy.yml, daily.yml
+└── vercel.json
+```
 
 ---
 
@@ -146,35 +126,41 @@ Atividades da próxima etapa:
 
 ## Concluído na Última Iteração
 
-* ✅ Guia Editorial (06-editorial-guide.md)
-* ✅ Prompts dos Agentes (07-prompts.md)
-* ✅ Interface/UI (08-ui.md)
-* ✅ Design System (09-design-system.md)
-* ✅ Automação (10-automation.md)
-* ✅ Deploy (11-deployment.md)
+* ✅ Setup Next.js 16 + TypeScript + Tailwind v4
+* ✅ Estrutura de diretórios
+* ✅ Tipos compartilhados (types/)
+* ✅ Configurações base (config/cycle.ts, config/sources.ts, config/categories.ts)
+* ✅ Utilitários (date, countdown, reading-time)
+* ✅ Design system (tokens CSS no globals.css)
+* ✅ Componentes de layout (Header, Footer, CountdownBanner)
+* ✅ Componentes da home (WeeklyNavigation, WeekArchive)
+* ✅ Página principal com duas colunas
+* ✅ Página de capítulo individual /[ano]/[mes]/[dia]
+* ✅ Sistema de conteúdo MDX (content/ + lib/content.ts)
+* ✅ Scripts de automação (create-post, import-rss, sitemap, check-links, backup)
+* ✅ Arquitetura dos 8 agentes editoriais (base + implementações)
+* ✅ Pipeline diário orquestrado (automation/daily-pipeline.ts)
+* ✅ GitHub Actions (test.yml, deploy.yml, daily.yml)
+* ✅ Configuração Vercel
+* ✅ Deploy publicado em novociclo.vercel.app
 
 ## Próxima Iteração — Prioridade Alta
 
-* Inicializar projeto Next.js com TypeScript e Tailwind.
-* Criar estrutura de diretórios.
-* Implementar configurações base (config/cycle.ts, config/sources.ts).
-* Criar tipos compartilhados (types/).
-* Implementar componentes de layout (Header, Footer, Countdown Banner).
-* Implementar página principal com estrutura de duas colunas.
+* Integrar API de IA (LLM) nos agentes para geração real de capítulos
+* Configurar GitHub Secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, LLM_API_KEY)
+* Implementar testes automatizados
 
 ## Prioridade Média
 
-* Implementar navegação semanal.
-* Implementar archive accordion.
-* Configurar GitHub Actions (daily.yml, deploy.yml, test.yml).
-* Configurar Vercel.
+* Implementar busca
+* Configurar RSS feed real e integração com import-rss
+* Implementar newsletter
 
 ## Prioridade Baixa
 
-* Implementar página de capítulo individual.
-* Implementar busca.
-* Configurar newsletter.
-* Criar testes automatizados iniciais.
+* Páginas estáticas (Manifesto, Sobre, Créditos, Contato)
+* Registrar domínio próprio
+* Animações e refinamentos de UI
 
 ---
 
@@ -204,28 +190,30 @@ Manter múltiplas fontes configuradas e monitoramento de falhas.
 
 ---
 
-# Pendências
+## Dependência de API de IA
 
-A documentação estrutural foi concluída.
+O pipeline diário depende de uma API externa (OpenAI/Anthropic) para gerar conteúdo.
 
-O próximo passo é iniciar a implementação do código.
+Impacto:
 
-Não existem bloqueadores para o início do desenvolvimento.
+Alto — sem a API, o pipeline não produz capítulos.
+
+Mitigação:
+
+* Configurar fallback entre provedores.
+* Implementar retry com backoff.
+* Notificar falhas via GitHub Issues.
 
 ---
 
-# Critério para Início da Implementação
+# Pendências
 
-✅ Atendido — Todos os documentos obrigatórios foram concluídos:
+O desenvolvimento da base do projeto está concluído. A aplicação está no ar.
 
-* Guia Editorial
-* Prompts
-* UI
-* Design System
-* Automação
-* Deploy
-
-O desenvolvimento pode ser iniciado.
+Os próximos passos são:
+1. Configurar secrets do GitHub (fora do escopo da IA — ação manual)
+2. Integrar API de LLM nos agentes
+3. Criar testes automatizados
 
 ---
 
