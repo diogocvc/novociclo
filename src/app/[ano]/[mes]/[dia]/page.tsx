@@ -5,7 +5,7 @@ import CountdownBanner from "@/components/layout/CountdownBanner";
 import WeeklyNavigation from "@/components/home/WeeklyNavigation";
 import WeekArchive from "@/components/home/WeekArchive";
 import ChapterContent from "@/components/chapter/ChapterContent";
-import { getChapterBySlug, mockChapters } from "@/data/mock-chapters";
+import { getChapterBySlug, getAllPublishedChapters } from "@/data/mock-chapters";
 
 interface Props {
   params: Promise<{
@@ -19,7 +19,8 @@ export default async function ChapterPage({ params }: Props) {
   const { ano, mes, dia } = await params;
   const slug = `${ano}/${mes}/${dia}`;
   const chapter = getChapterBySlug(slug);
-  const publishedSlugs = mockChapters.map((c) => c.slug);
+  const chapters = getAllPublishedChapters();
+  const publishedSlugs = chapters.map((c) => c.slug);
 
   if (!chapter) {
     notFound();
@@ -35,7 +36,7 @@ export default async function ChapterPage({ params }: Props) {
       </main>
 
       <WeeklyNavigation publishedSlugs={publishedSlugs} />
-      <WeekArchive chapters={mockChapters} />
+      <WeekArchive chapters={chapters} />
       <Footer />
     </>
   );

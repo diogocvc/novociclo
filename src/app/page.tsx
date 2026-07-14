@@ -4,11 +4,12 @@ import CountdownBanner from "@/components/layout/CountdownBanner";
 import WeeklyNavigation from "@/components/home/WeeklyNavigation";
 import WeekArchive from "@/components/home/WeekArchive";
 import ChapterContent from "@/components/chapter/ChapterContent";
-import { getLatestChapter, mockChapters } from "@/data/mock-chapters";
+import { getLatestChapter, getAllPublishedChapters } from "@/data/mock-chapters";
 
 export default function Home() {
+  const chapters = getAllPublishedChapters();
   const chapter = getLatestChapter();
-  const publishedSlugs = mockChapters.map((c) => c.slug);
+  const publishedSlugs = chapters.map((c) => c.slug);
 
   return (
     <>
@@ -24,7 +25,7 @@ export default function Home() {
       </main>
 
       <WeeklyNavigation publishedSlugs={publishedSlugs} />
-      <WeekArchive chapters={mockChapters} />
+      <WeekArchive chapters={chapters} />
       <Footer />
     </>
   );
