@@ -9,17 +9,17 @@ interface Props {
 export default function NoNewsToday({ latestDate, latestSlug }: Props) {
   return (
     <div className="max-w-[820px]">
-      <p className="text-lg sm:text-xl font-headline leading-relaxed text-text/70">
+      <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold font-headline leading-[1.0] tracking-tight text-text/70">
         Não há nenhuma novidade do Novo Ciclo hoje, mas você pode se atualizar
         com as últimas notícias do dia{" "}
         <a
           href={`/${latestSlug}`}
-          className="inline-block mt-2 sm:mt-0 sm:ml-2 bg-green-primary text-white font-bold text-sm uppercase tracking-wider px-5 py-3 rounded-md hover:bg-green-primary/90 transition-colors"
+          className="inline-block mt-3 sm:mt-0 sm:ml-2 bg-green-primary text-white font-bold text-sm uppercase tracking-wider px-5 py-3 rounded-md hover:bg-green-primary/90 transition-colors"
         >
           {format(latestDate, "dd/MM/yyyy", { locale: ptBR })}
         </a>
         .
-      </p>
+      </h1>
     </div>
   );
 }
