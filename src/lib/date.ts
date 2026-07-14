@@ -44,3 +44,12 @@ export function formatDateShort(date: Date): string {
 export function formatDateRelative(date: Date): string {
   return formatDistanceToNow(date, { addSuffix: true, locale: ptBR });
 }
+
+export function getWeekNumber(
+  date: Date,
+  cycleStart: Date
+): number {
+  const diffMs = date.getTime() - cycleStart.getTime();
+  const dayNumber = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+  return Math.ceil(dayNumber / 7);
+}

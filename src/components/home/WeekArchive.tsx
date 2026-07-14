@@ -5,6 +5,8 @@ import { ChevronDown } from "lucide-react";
 import { format, startOfWeek, addDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Chapter } from "@/types";
+import { cycle } from "@/config/cycle";
+import { getWeekNumber } from "@/lib/date";
 
 interface WeekData {
   id: string;
@@ -36,10 +38,7 @@ function buildWeeks(chapters: Chapter[]): WeekData[] {
       return format(start, "yyyy-MM-dd") === weekKey;
     });
 
-    const weekNumber = Math.ceil(
-      (date.getTime() - new Date("2026-07-05").getTime()) /
-        (7 * 24 * 60 * 60 * 1000)
-    );
+    const weekNumber = getWeekNumber(weekStart, cycle.data_inicio);
 
     weeks.push({
       id: weekKey,

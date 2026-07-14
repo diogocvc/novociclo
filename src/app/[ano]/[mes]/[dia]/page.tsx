@@ -35,7 +35,10 @@ export default async function ChapterPage({ params }: Props) {
         <ChapterContent chapter={chapter} />
       </main>
 
-      <WeeklyNavigation publishedSlugs={publishedSlugs} />
+      <WeeklyNavigation
+        currentDate={new Date(chapter.data)}
+        publishedSlugs={publishedSlugs}
+      />
       <WeekArchive chapters={chapters} />
       <Footer />
     </>

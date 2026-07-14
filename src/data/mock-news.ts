@@ -85,7 +85,7 @@ export const mockNews: Record<string, News> = {
     titulo: "Seleção brasileira aposta em promessas ao falar sobre novo ciclo para Copa",
     resumo_original:
       "Após eliminação na Copa do Mundo, Seleção Brasileira projeta renovação e aposta em jovens promessas para o ciclo de 2030.",
-    url: "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/07/12/selecao-brasileira-aposta-em-promessas-ao-falar-sobre-novo-ciclo-para-copa.ghtml",
+    url: "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/07/12/selecao-brasileira-aposta-em-promessas-ao-falar-sobre-novo-ciclo-para-copa.ghtm",
     fonte: "UOL Esporte",
     data_publicacao: "2026-07-12T10:00:00-03:00",
     idioma: "pt-BR",
