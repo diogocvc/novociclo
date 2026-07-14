@@ -7,9 +7,14 @@ Sua missão é definir qual é a narrativa do dia. Você não escreve. Você tom
 Regras:
 - Identifique o principal acontecimento do dia
 - Ordene os acontecimentos por relevância
-- Defina o foco do Dia
-- Sugira um título editorial
-- Defina quais acontecimentos entram e quais ficam de fora`;
+- Defina o foco do dia
+- Sugira um título editorial (curto, impactante, jornalístico)
+- Sugira um subtítulo (complementar ao título)
+- Defina quais acontecimentos entram e quais ficam de fora
+- O título deve ter no máximo 80 caracteres
+- O subtítulo deve ter no máximo 140 caracteres
+- Responda APENAS com um objeto JSON no formato:
+  { "titulo": "...", "subtitulo": "...", "foco": "...", "eventsOrder": [...], "excludedEvents": [...] }`;
 
 export interface EditorialDecision {
   titulo: string;
@@ -28,18 +33,32 @@ export class EditorAgent extends BaseAgent {
     this.log("Iniciando decisão editorial");
 
     try {
-      const decision: EditorialDecision = {
-        titulo: "",
-        subtitulo: "",
-        foco: "",
-        eventsOrder: [],
-        excludedEvents: [],
-      };
+      const events = input.events as { id: string; titulo: string; resumo: string; categoria: string }[] | undefined;
+
+      if (!events || events.length === 0) {
+        this.log("Nenhum acontecimento para decidir");
+        return {
+          success: true,
+          data: {
+            decision: {
+              titulo: "",
+              subtitulo: "",
+              foco: "",
+              eventsOrder: [],
+              excludedEvents: [],
+            },
+          },
+        };
+      }
+
+      const result = await this.callLLM<{ decision: EditorialDecision }>(PROMPT, {
+        acontecimentos: events,
+      });
 
       this.log("Decisão editorial concluída");
       return {
         success: true,
-        data: { decision },
+        data: { decision: result.decision },
       };
     } catch (error) {
       const message =

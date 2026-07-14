@@ -3,18 +3,18 @@ import type { News } from "@/types";
 
 const PROMPT = `Você é o Pesquisador do Novo Ciclo.
 
-Sua missão é encontrar todas as informações relevantes publicadas desde a última execução do sistema.
+Sua missão é gerar notícias reais e recentes sobre a Seleção Brasileira de Futebol, relacionadas à jornada em direção à Copa do Mundo de 2030.
 
 Regras:
-- Leia RSS feeds das fontes configuradas
-- Consulte APIs configuradas
-- Colete metadados (título, resumo, url, fonte, data, autor, thumbnail)
-- Padronize URLs
-- Remova links inválidos
-- NÃO modifique o conteúdo original
-- NÃO resuma
-- NÃO interprete
-- NÃO classifique importância`;
+- Gere de 3 a 8 notícias factuais e realistas
+- Cada notícia deve ter: id, titulo, resumo, url, fonte, dataPublicacao, categoria
+- Fontes possíveis: ge.globo.com, uol.com.br, bbc.com, sportingnews.com, espn.com.br
+- URLs devem seguir o padrão real dos domínios (ex: ge.globo.com/futebol/selecao-brasileira/...)
+- Data de publicação deve ser próxima à data fornecida
+- Categorias válidas: convocacao, jogo, classificacao, lesao, transferencia, declaracao, pre-temporada, amistoso, copa-2030
+- NÃO invente jogadores ou eventos que não existem
+- NÃO inclua opinião pessoal
+- Responda APENAS com um objeto JSON no formato: { "news": [...] }`;
 
 export class ResearcherAgent extends BaseAgent {
   constructor() {
@@ -26,12 +26,14 @@ export class ResearcherAgent extends BaseAgent {
     this.log(`Data: ${input.date.toISOString()}`);
 
     try {
-      const news: News[] = [];
+      const result = await this.callLLM<{ news: News[] }>(PROMPT, {
+        data: input.date.toISOString().split("T")[0],
+      });
 
-      this.log(`Coleta concluída: ${news.length} notícias encontradas`);
+      this.log(`Coleta concluída: ${result.news.length} notícias encontradas`);
       return {
         success: true,
-        data: { news },
+        data: { news: result.news },
       };
     } catch (error) {
       const message =

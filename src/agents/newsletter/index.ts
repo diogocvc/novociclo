@@ -1,5 +1,6 @@
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PROMPT = `Você é o Agente de Newsletter do Novo Ciclo.
 
 Sua missão é transformar o capítulo do dia em um e-mail conciso que incentive o leitor a acessar o site.

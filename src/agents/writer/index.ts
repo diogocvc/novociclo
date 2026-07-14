@@ -9,7 +9,11 @@ Regras:
 - Tom sóbrio e informativo
 - Nunca expresse opinião
 - Baseie-se exclusivamente nos acontecimentos fornecidos
-- Estrutura: título, subtítulo, resumo, corpo do capítulo`;
+- O resumo deve ter de 2 a 4 frases curtas
+- O corpo deve ter de 3 a 6 parágrafos, no estilo de análise jornalística
+- Use linguagem clara e direta
+- Responda APENAS com um objeto JSON no formato:
+  { "draft": { "titulo": "...", "subtitulo": "...", "resumo": "...", "corpo": "..." } }`;
 
 export interface ChapterDraft {
   titulo: string;
@@ -27,17 +31,39 @@ export class WriterAgent extends BaseAgent {
     this.log("Iniciando escrita do capítulo");
 
     try {
-      const draft: ChapterDraft = {
-        titulo: "",
-        subtitulo: "",
-        resumo: "",
-        corpo: "",
-      };
+      const decision = input.decision as {
+        titulo: string;
+        subtitulo: string;
+        foco: string;
+        eventsOrder: string[];
+      } | undefined;
+
+      const events = input.events as {
+        id: string;
+        titulo: string;
+        resumo: string;
+        categoria: string;
+      }[] | undefined;
+
+      if (!decision || !decision.titulo) {
+        this.log("Nenhuma decisão editorial para escrever");
+        return {
+          success: true,
+          data: {
+            draft: { titulo: "", subtitulo: "", resumo: "", corpo: "" },
+          },
+        };
+      }
+
+      const result = await this.callLLM<{ draft: ChapterDraft }>(PROMPT, {
+        decisao_editorial: decision,
+        acontecimentos: events,
+      });
 
       this.log("Capítulo escrito com sucesso");
       return {
         success: true,
-        data: { draft },
+        data: { draft: result.draft },
       };
     } catch (error) {
       const message =

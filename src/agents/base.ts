@@ -1,4 +1,4 @@
-import type { Chapter } from "@/types";
+import { callLLM as llmClient, type LLMConfig } from "@/lib/llm";
 
 export interface AgentInput {
   date: Date;
@@ -22,6 +22,23 @@ export abstract class BaseAgent {
   }
 
   abstract execute(input: AgentInput): Promise<AgentOutput>;
+
+  protected async callLLM<T>(
+    systemPrompt: string,
+    userInput: Record<string, unknown>,
+    config?: LLMConfig
+  ): Promise<T> {
+    this.log("Consultando LLM...");
+    const { content, tokens } = await llmClient<T>(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: JSON.stringify(userInput, null, 2) },
+      ],
+      config
+    );
+    this.log(`LLM respondeu (${tokens.total} tokens)`);
+    return content;
+  }
 
   protected log(message: string, level: "info" | "warn" | "error" = "info") {
     const prefix = `[${this.name}]`;

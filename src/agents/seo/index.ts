@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PROMPT = `Você é o Agente de SEO do Novo Ciclo.
 
 Sua missão é atualizar automaticamente todos os recursos necessários para indexação após a publicação de um novo capítulo.
