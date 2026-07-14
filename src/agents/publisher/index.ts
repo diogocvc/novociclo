@@ -45,10 +45,17 @@ export class PublisherAgent extends BaseAgent {
       }
 
       const filePath = path.join(contentDir, `${day}.mdx`);
+      const dateStr = `${year}-${month}-${day}`;
       const mdxContent = `---
+id: "${dateStr}"
+data: "${dateStr}"
+slug: "${year}/${month}/${day}"
 titulo: "${draft.titulo}"
-${draft.subtitulo ? `subtitulo: "${draft.subtitulo}"` : ""}
-resumo: "${draft.resumo}"
+${draft.subtitulo ? `subtitulo: "${draft.subtitulo}"\n` : ""}resumo: "${draft.resumo}"
+categorias: []
+tags: []
+referencias: []
+tempo_de_leitura: 1
 ---
 
 ${draft.corpo}

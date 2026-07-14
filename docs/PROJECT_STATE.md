@@ -83,6 +83,8 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Agentes (base)**      | ✅ Concluído     |
 | **Pipeline Diário**     | ✅ Concluído     |
 | **Deploy Vercel**       | ✅ Concluído     |
+| **LLM (Groq)**          | ✅ Concluído     |
+| **Pipeline End-to-End** | ✅ Concluído     |
 | Testes                  | ⏳ Não iniciado  |
 
 ---
@@ -146,15 +148,14 @@ novo-ciclo/
 
 ## Próxima Iteração — Prioridade Alta
 
-* Integrar API de IA (LLM) nos agentes para geração real de capítulos
-* Configurar GitHub Secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, LLM_API_KEY)
+* Configurar GitHub Secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, LLM_API_KEY) — ação manual
 * Implementar testes automatizados
 
 ## Prioridade Média
 
 * Implementar busca
-* Configurar RSS feed real e integração com import-rss
-* Implementar newsletter
+* Configurar import-rss com fontes reais
+* Implementar newsletter com conteúdo real
 
 ## Prioridade Baixa
 

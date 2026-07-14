@@ -1,8 +1,7 @@
 const LLM_API_KEY = process.env.LLM_API_KEY ?? "";
 
-const DEFAULT_BASE_URL =
-  "https://generativelanguage.googleapis.com/v1beta/openai";
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_BASE_URL = "https://api.groq.com/openai/v1";
+const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 interface LLMMessage {
   role: "system" | "user" | "assistant";

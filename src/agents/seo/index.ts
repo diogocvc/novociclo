@@ -35,24 +35,23 @@ export class SEOAgent extends BaseAgent {
         this.log("Sitemap exists — would update here in production");
       }
 
+      const draft = input.draft as { titulo?: string } | undefined;
       const rssPath = path.join(publicDir, "rss.xml");
-      if (!fs.existsSync(rssPath)) {
-        const rss = `<?xml version="1.0" encoding="UTF-8"?>
+      const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Novo Ciclo</title>
     <link>${siteUrl}</link>
     <description>Rumo à Copa do Mundo 2030</description>
     <item>
-      <title>${(input.draft as { titulo: string })?.titulo ?? "Novo Ciclo"}</title>
+      <title>${draft?.titulo ?? "Novo Ciclo"}</title>
       <link>${siteUrl}/${year}/${month}/${day}</link>
       <pubDate>${date.toUTCString()}</pubDate>
     </item>
   </channel>
 </rss>`;
-        fs.writeFileSync(rssPath, rss, "utf-8");
-        this.log(`RSS feed criado: ${rssPath}`);
-      }
+      fs.writeFileSync(rssPath, rss, "utf-8");
+      this.log(`RSS feed atualizado: ${rssPath}`);
 
       this.log("SEO atualizado com sucesso");
       return {

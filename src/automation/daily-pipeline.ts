@@ -18,6 +18,7 @@ interface PipelineResult {
     error?: string;
     durationMs: number;
   }[];
+  outputs: AgentOutput[];
   success: boolean;
 }
 
@@ -44,6 +45,7 @@ export async function runDailyPipeline(
   const result: PipelineResult = {
     date: date.toISOString(),
     steps: [],
+    outputs: [],
     success: true,
   };
 
@@ -68,32 +70,41 @@ export async function runDailyPipeline(
   const steps = [
     step("Pesquisador", () => retry(() => researcher.execute(input), "Pesquisador")),
     step("Curador", () => {
-      input.news = (result.steps[0] as unknown as { data?: { news?: unknown } })?.data?.news;
+      const prev = result.outputs[0]?.data as { news?: unknown } | undefined;
+      input.news = prev?.news;
       return retry(() => curator.execute(input), "Curador");
     }),
     step("Editor-chefe", () => {
-      input.events = (result.steps[1] as unknown as { data?: { events?: unknown } })?.data?.events;
+      const prev = result.outputs[1]?.data as { events?: unknown } | undefined;
+      input.events = prev?.events;
       return retry(() => editor.execute(input), "Editor-chefe");
     }),
     step("Escritor", () => {
-      input.decision = (result.steps[2] as unknown as { data?: { decision?: unknown } })?.data?.decision;
+      const editorOutput = result.outputs[2]?.data as { decision?: unknown } | undefined;
+      input.decision = editorOutput?.decision;
+      input.events = (result.outputs[1]?.data as { events?: unknown } | undefined)?.events;
       return retry(() => writer.execute(input), "Escritor");
     }),
     step("Revisor", () => {
-      input.draft = (result.steps[3] as unknown as { data?: { draft?: unknown } })?.data?.draft;
+      const writerOutput = result.outputs[3]?.data as { draft?: unknown } | undefined;
+      input.draft = writerOutput?.draft;
       return retry(() => reviewer.execute(input), "Revisor");
     }),
     step("Publicador", () => {
-      const review = (result.steps[4] as unknown as { data?: { review?: { approved: boolean } } })?.data?.review;
-      if (!review?.approved) {
+      const reviewerOutput = result.outputs[4]?.data as { review?: { approved: boolean } } | undefined;
+      if (!reviewerOutput?.review?.approved) {
         return Promise.resolve({ success: false, error: "Capítulo não aprovado na revisão" });
       }
       return retry(() => publisher.execute(input), "Publicador");
     }),
     step("Newsletter", () => {
+      const writerDraft = result.outputs[3]?.data as { draft?: unknown } | undefined;
+      input.draft = writerDraft?.draft;
       return retry(() => newsletter.execute(input), "Newsletter");
     }),
     step("SEO", () => {
+      const writerDraft = result.outputs[3]?.data as { draft?: unknown } | undefined;
+      input.draft = writerDraft?.draft;
       return retry(() => seo.execute(input), "SEO");
     }),
   ];
@@ -118,6 +129,7 @@ export async function runDailyPipeline(
       error: output.error,
       durationMs,
     });
+    result.outputs.push(output);
 
     if (!output.success) {
       result.success = false;

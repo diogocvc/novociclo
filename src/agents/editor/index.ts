@@ -51,14 +51,14 @@ export class EditorAgent extends BaseAgent {
         };
       }
 
-      const result = await this.callLLM<{ decision: EditorialDecision }>(PROMPT, {
+      const result = await this.callLLM<EditorialDecision>(PROMPT, {
         acontecimentos: events,
       });
 
       this.log("Decisão editorial concluída");
       return {
         success: true,
-        data: { decision: result.decision },
+        data: { decision: result },
       };
     } catch (error) {
       const message =

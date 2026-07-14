@@ -12,7 +12,7 @@
     "scripts:generate-sitemap": "npx tsx src/scripts/generate-sitemap.ts",
     "scripts:check-links": "npx tsx src/scripts/check-links.ts",
     "scripts:backup": "npx tsx src/scripts/backup.ts",
-    "pipeline": "npx tsx src/automation/daily-pipeline.ts"
+    "pipeline": "npx tsx --env-file=.env src/automation/daily-pipeline.ts"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
