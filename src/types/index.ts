@@ -36,6 +36,8 @@ export interface Chapter {
   data_publicacao: string;
   tempo_de_leitura: number;
   frontmatter: Record<string, string>;
+  noticia_destaque?: News;
+  noticias_referencia: News[];
 }
 
 export interface Source {
