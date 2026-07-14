@@ -14,7 +14,11 @@ interface DayCard {
   slug?: string;
 }
 
-export default function WeeklyNavigation() {
+interface Props {
+  publishedSlugs?: string[];
+}
+
+export default function WeeklyNavigation({ publishedSlugs = [] }: Props) {
   const [weekDays, setWeekDays] = useState<DayCard[]>([]);
 
   useEffect(() => {
@@ -22,16 +26,21 @@ export default function WeeklyNavigation() {
     const weekStart = startOfWeek(today, { weekStartsOn: 1 });
     const days: DayCard[] = Array.from({ length: 7 }, (_, i) => {
       const date = addDays(weekStart, i);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const slug = `${y}/${m}/${d}`;
       return {
         label: format(date, "EEE", { locale: ptBR }).toUpperCase(),
         day: date.getDate(),
         date,
         isToday: date.toDateString() === today.toDateString(),
         isFuture: date > today,
+        slug: publishedSlugs.includes(slug) ? `/${slug}` : undefined,
       };
     });
     setWeekDays(days);
-  }, []);
+  }, [publishedSlugs]);
 
   if (weekDays.length === 0) return null;
 
