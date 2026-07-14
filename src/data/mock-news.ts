@@ -8,7 +8,7 @@ export const mockNews: Record<string, News> = {
       "Coordenador técnico da Seleção Brasileira acompanha treinos de atletas sub-20 visando renovação do elenco principal.",
     url: "https://ge.globo.com/futebol/selecao-brasileira/noticia/2026/07/14/comissao-tecnica-avalia-jovens-talentos.ghtml",
     thumbnail:
-      "https://s2-ge.glbimg.com/example1.jpg",
+      "https://picsum.photos/seed/ge-talentos/800/450",
     fonte: "ge",
     autor: "Alexandre Oliveira",
     data_publicacao: "2026-07-14T09:30:00-03:00",
@@ -22,7 +22,7 @@ export const mockNews: Record<string, News> = {
       "Conselho da FIFA aprovou o regulamento definitivo do torneio que celebrará o centenário em Argentina, Uruguai, Paraguai, Espanha, Portugal e Marrocos.",
     url: "https://www.espn.com.br/futebol/copa-do-mundo/artigo/fifa-formato-2030",
     thumbnail:
-      "https://a2.espncdn.com/example2.jpg",
+      "https://picsum.photos/seed/fifa-formato/800/450",
     fonte: "ESPN Brasil",
     autor: "Marcelo Teixeira",
     data_publicacao: "2026-07-14T08:15:00-03:00",
@@ -36,7 +36,7 @@ export const mockNews: Record<string, News> = {
       "Atletas convocáveis da Seleção Brasileira chamam atenção nos primeiros amistosos de preparação dos clubes europeus.",
     url: "https://www.uol.com.br/esporte/futebol/selecao-brasileira/2026/07/14/jogadores-destaque-pre-temporada.htm",
     thumbnail:
-      "https://conteudo.uol.com.br/example3.jpg",
+      "https://picsum.photos/seed/jogadores-pre-temporada/800/450",
     fonte: "UOL Esporte",
     autor: "Rafael Reis",
     data_publicacao: "2026-07-14T07:00:00-03:00",
@@ -49,6 +49,8 @@ export const mockNews: Record<string, News> = {
     resumo_original:
       "Acordo prevê compartilhamento de infraestrutura e metodologia entre a confederação e as principais agremiações do país.",
     url: "https://www.cbf.com.br/selecao-brasileira/noticias/cbf-parceria-centro-treinamento",
+    thumbnail:
+      "https://picsum.photos/seed/cbf-parceria/800/450",
     fonte: "CBF",
     data_publicacao: "2026-07-14T11:00:00-03:00",
     idioma: "pt-BR",
@@ -61,7 +63,7 @@ export const mockNews: Record<string, News> = {
       "Meio-campista brasileiro sofre estiramento na coxa direita e desfalca clube inglês por até três semanas.",
     url: "https://www.cnnbrasil.com.br/esportes/futebol/selecao-brasileira/lesao-volante-inglaterra/",
     thumbnail:
-      "https://www.cnnbrasil.com.br/example4.jpg",
+      "https://picsum.photos/seed/lesao-volante/800/450",
     fonte: "CNN Brasil",
     autor: "Fábio Lopes",
     data_publicacao: "2026-07-14T06:45:00-03:00",
@@ -75,7 +77,7 @@ export const mockNews: Record<string, News> = {
       "Rodada do Campeonato Brasileiro sub-20 teve atuações de destaque que chamaram atenção dos observadores da CBF.",
     url: "https://ge.globo.com/futebol/base/noticia/2026/07/13/categorias-base-revelam-geracao.ghtml",
     thumbnail:
-      "https://s2-ge.glbimg.com/example5.jpg",
+      "https://picsum.photos/seed/base-revelacao/800/450",
     fonte: "ge",
     autor: "Thiago Simões",
     data_publicacao: "2026-07-13T10:00:00-03:00",
@@ -88,6 +90,8 @@ export const mockNews: Record<string, News> = {
     resumo_original:
       "Profissional esteve presente em duas partidas no interior de São Paulo para observar atletas pouco conhecidos do grande público.",
     url: "https://www.uol.com.br/esporte/futebol/2026/07/13/coordenador-tecnico-estadual.htm",
+    thumbnail:
+      "https://picsum.photos/seed/coordenador-estadual/800/450",
     fonte: "UOL Esporte",
     autor: "Danilo Lavieri",
     data_publicacao: "2026-07-13T14:00:00-03:00",
@@ -100,6 +104,8 @@ export const mockNews: Record<string, News> = {
     resumo_original:
       "Ídolos do futebol nacional cobram diálogo mais próximo entre a CBF e os clubes formadores para evitar desgastes desnecessários.",
     url: "https://www.espn.com.br/futebol/artigo/ex-jogadores-integradcao-clubes-selecao",
+    thumbnail:
+      "https://picsum.photos/seed/ex-jogadores-integracao/800/450",
     fonte: "ESPN Brasil",
     autor: "João Castelo-Branco",
     data_publicacao: "2026-07-13T09:30:00-03:00",
