@@ -11,12 +11,12 @@ export default function ChapterContent({ chapter }: Props) {
 
   return (
     <div>
-      <div className="flex flex-col lg:flex-row lg:gap-12">
+      <div className="flex flex-col lg:flex-row lg:gap-16">
         <div className="lg:w-[45%]">
           <p className="text-sm text-green-primary font-medium uppercase tracking-wider mb-4">
             {formatDate(new Date(chapter.data))}
           </p>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold font-headline leading-[1.0] tracking-tight text-text">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold font-headline leading-[1.1] tracking-tight text-text break-words">
             {chapter.titulo}
           </h1>
           {chapter.subtitulo && (
@@ -26,7 +26,7 @@ export default function ChapterContent({ chapter }: Props) {
           )}
         </div>
 
-        <div className="lg:w-[55%] mt-6 lg:mt-0">
+        <div className="lg:w-[55%] mt-8 lg:mt-0 lg:pt-4">
           {noticia_destaque && (
             <a
               href={noticia_destaque.url}
