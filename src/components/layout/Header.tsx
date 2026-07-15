@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/manifesto", label: "Manifesto" },
   { href: "/sobre", label: "Sobre" },
   { href: "/creditos", label: "Créditos" },
   { href: "/contato", label: "Contato" },

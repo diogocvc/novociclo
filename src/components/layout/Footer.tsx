@@ -9,9 +9,6 @@ export default function Footer() {
           <p className="uppercase tracking-wider">Rumo à Copa do Mundo 2030</p>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/manifesto" className="uppercase tracking-wider hover:text-green-primary transition-colors">
-            Manifesto
-          </Link>
           <Link href="/sobre" className="uppercase tracking-wider hover:text-green-primary transition-colors">
             Sobre
           </Link>
