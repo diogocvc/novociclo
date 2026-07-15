@@ -46,3 +46,10 @@ export function getChapterBySlug(slug: string): Chapter | undefined {
   if (!raw) return undefined;
   return buildChapter(raw);
 }
+
+export function getLatestChapterWithNews(): Chapter | undefined {
+  const chapters = getAllPublishedChapters();
+  return chapters.find(
+    (c) => c.noticia_destaque || c.noticias_referencia.length > 0
+  );
+}

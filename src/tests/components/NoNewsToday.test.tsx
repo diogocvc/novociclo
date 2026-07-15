@@ -3,9 +3,10 @@ import { render, screen } from "@testing-library/react";
 import NoNewsToday from "@/components/home/NoNewsToday";
 
 describe("NoNewsToday", () => {
-  it("renders the message", () => {
+  it("renders 'hoje' message when date is today", () => {
     render(
       <NoNewsToday
+        date={new Date()}
         latestDate={new Date("2026-07-13")}
         latestSlug="2026/07/13"
       />
@@ -13,6 +14,20 @@ describe("NoNewsToday", () => {
 
     expect(
       screen.getByText(/não há nenhuma novidade do novo ciclo hoje/i)
+    ).toBeDefined();
+  });
+
+  it("renders 'neste dia' message when date is in the past", () => {
+    render(
+      <NoNewsToday
+        date={new Date("2026-07-14")}
+        latestDate={new Date("2026-07-13")}
+        latestSlug="2026/07/13"
+      />
+    );
+
+    expect(
+      screen.getByText(/não houve notícias do novo ciclo neste dia/i)
     ).toBeDefined();
   });
 

@@ -1,17 +1,21 @@
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 interface Props {
+  date?: Date;
   latestDate: Date;
   latestSlug: string;
 }
 
-export default function NoNewsToday({ latestDate, latestSlug }: Props) {
+export default function NoNewsToday({ date, latestDate, latestSlug }: Props) {
+  const isToday = date && isSameDay(date, new Date());
+
   return (
     <div className="max-w-[820px]">
       <h1 className="text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem] xl:text-[4.8rem] font-bold font-headline leading-[1.0] tracking-tight text-text/70">
-        Não há nenhuma novidade do Novo Ciclo hoje, mas você pode se atualizar
-        com as últimas notícias do dia:
+        {isToday
+          ? "Não há nenhuma novidade do Novo Ciclo hoje, mas você pode se atualizar com as últimas notícias do dia:"
+          : "Não houve notícias do Novo Ciclo neste dia. Veja o capítulo mais recente com notícias:"}
       </h1>
       <a
         href={`/${latestSlug}`}

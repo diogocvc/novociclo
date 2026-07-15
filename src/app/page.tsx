@@ -23,6 +23,7 @@ export default function Home() {
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
         {!hasNewsToday && chapters.length > 0 ? (
           <NoNewsToday
+            date={today}
             latestDate={new Date(chapters[0].data)}
             latestSlug={chapters[0].slug}
           />
