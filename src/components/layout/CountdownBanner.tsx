@@ -22,16 +22,6 @@ export default function CountdownBanner() {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-6">
-      <div className="p-6 bg-white rounded-md border border-gray-light mb-6">
-        <p className="text-base text-text/70 italic leading-relaxed">
-          &ldquo;Quando passa um momento assim, tem que pensar que uma derrota é o
-          começo de uma nova aventura. Não é o fim, é o início de um novo
-          ciclo.&rdquo;
-        </p>
-        <p className="mt-3 text-sm text-gray-medium">
-          &mdash; Carlo Ancelotti, 5 de julho de 2026
-        </p>
-      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 rounded-lg overflow-hidden text-white text-center">
         <div className="bg-green-primary p-4 lg:p-6 flex flex-col items-center justify-center">
           <span className="text-xs uppercase tracking-widest mb-1">DIAS PASSADOS</span>

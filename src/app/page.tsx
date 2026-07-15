@@ -20,6 +20,17 @@ export default function Home() {
       <Header />
       <CountdownBanner />
 
+      <div className="w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-8">
+        <p className="text-base text-text/70 italic leading-relaxed text-center">
+          &ldquo;Quando passa um momento assim, tem que pensar que uma derrota é o
+          começo de uma nova aventura. Não é o fim, é o início de um novo
+          ciclo.&rdquo;
+        </p>
+        <p className="mt-2 text-sm text-gray-medium text-center">
+          &mdash; Carlo Ancelotti, 5 de julho de 2026
+        </p>
+      </div>
+
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
         {!hasNewsToday && chapters.length > 0 ? (
           <NoNewsToday
