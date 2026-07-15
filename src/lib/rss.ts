@@ -59,6 +59,15 @@ function extractLink(item: RssItem | AtomEntry): string {
   return "";
 }
 
+function extractThumbnail(item: RssItem): string | undefined {
+  const media = item["media:content"];
+  if (media?.["@_url"]) return media["@_url"];
+
+  const desc = extractText(item.description || item["content:encoded"]);
+  const match = desc.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match?.[1] ?? undefined;
+}
+
 function parseRssItems(channel: RssChannel): RawNews[] {
   if (!channel.item) return [];
   return channel.item.map((item: RssItem) => ({
@@ -66,6 +75,7 @@ function parseRssItems(channel: RssChannel): RawNews[] {
     link: extractLink(item),
     description: extractText(item.description || item["content:encoded"]),
     pubDate: item.pubDate ?? "",
+    thumbnail: extractThumbnail(item),
   }));
 }
 
@@ -84,6 +94,7 @@ interface RawNews {
   link: string;
   description: string;
   pubDate: string;
+  thumbnail?: string;
 }
 
 export async function fetchSourceRss(
@@ -123,6 +134,7 @@ export async function fetchAllRss(): Promise<News[]> {
           titulo: item.title,
           resumo_original: item.description || item.title,
           url: item.link,
+          thumbnail: item.thumbnail,
           fonte: source.nome,
           autor: undefined,
           data_publicacao: item.pubDate || new Date().toISOString(),
