@@ -11,8 +11,9 @@ describe("Header", () => {
 
   it("links to home", () => {
     render(<Header />);
-    const link = screen.getByRole("link");
-    expect(link.getAttribute("href")).toBe("/");
+    const links = screen.getAllByRole("link");
+    const homeLink = links.find((l) => l.getAttribute("href") === "/");
+    expect(homeLink).toBeDefined();
   });
 
   it("renders menu button", () => {
