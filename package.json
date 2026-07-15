@@ -12,6 +12,7 @@
     "scripts:generate-sitemap": "tsx src/scripts/generate-sitemap.ts",
     "scripts:check-links": "tsx src/scripts/check-links.ts",
     "scripts:cleanup": "tsx src/scripts/cleanup-chapters.ts",
+    "scripts:backfill": "tsx src/scripts/backfill-news.ts",
     "scripts:backup": "tsx src/scripts/backup.ts",
     "pipeline": "tsx src/automation/daily-pipeline.ts",
     "test": "vitest run",

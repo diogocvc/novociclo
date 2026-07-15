@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 15/07/2026 (matriz de grupos, filtro por data, cleanup, título menor, overflow)
+**Última atualização:** 15/07/2026 (backfill dos capítulos 05-13 com notícias reais de cada data)
 
 ---
 
@@ -122,7 +122,7 @@ novo-ciclo/
 │   ├── newsletter/
 │   └── seo/
 ├── automation/             → daily-pipeline.ts
-├── scripts/                → create-post, import-rss, generate-sitemap, backup
+├── scripts/                → create-post, import-rss, generate-sitemap, backup, cleanup-chapters, backfill-news
 ├── .github/workflows/      → test.yml, daily.yml
 └── vercel.json
 ```
@@ -164,6 +164,9 @@ novo-ciclo/
 * ✅ Validação pós-LLM com o mesmo filtro de relevância
 * ✅ Título do capítulo reduzido ~30% + break-words + ajuste layout da notícia em destaque
 * ✅ Script cleanup-chapters para re-aplicar filtro em capítulos existentes
+* ✅ Backfill dos capítulos 05-13 com notícias reais por data (web search real ge.globo.com, UOL, Folha, BBC, Estadão, Exame)
+* ✅ Capítulos 07, 08, 09, 10, 13 criados (estavam faltando) com narrativas baseadas em notícias reais
+* ✅ Script backfill-news.ts com dados estruturados de +20 artigos reais
 
 ## Próxima Iteração — Prioridade Alta
 
