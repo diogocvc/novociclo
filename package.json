@@ -13,6 +13,7 @@
     "scripts:check-links": "tsx src/scripts/check-links.ts",
     "scripts:cleanup": "tsx src/scripts/cleanup-chapters.ts",
     "scripts:backfill": "tsx src/scripts/backfill-news.ts",
+    "scripts:thumbnails": "tsx src/scripts/fetch-thumbnails.ts",
     "scripts:backup": "tsx src/scripts/backup.ts",
     "pipeline": "tsx src/automation/daily-pipeline.ts",
     "test": "vitest run",

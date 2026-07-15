@@ -45,11 +45,11 @@ export default function ChapterContent({ chapter }: Props) {
               ) : (
                 <div className="aspect-[16/9] rounded-md bg-gray-light" />
               )}
-              <p className="mt-3 text-sm text-gray-medium flex items-center gap-1">
+              <p className="mt-3 text-sm text-gray-medium leading-snug">
+                {noticia_destaque.titulo}.{" "}
                 <span className="font-medium text-green-primary">
-                  {noticia_destaque.fonte}
+                  Veja em: {noticia_destaque.fonte}
                 </span>
-                <span className="text-xs">→</span>
               </p>
             </a>
           )}

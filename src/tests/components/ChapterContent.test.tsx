@@ -63,7 +63,7 @@ describe("ChapterContent", () => {
 
   it("renders featured news source", () => {
     render(<ChapterContent chapter={mockChapter} />);
-    const sources = screen.getAllByText("ge");
+    const sources = screen.getAllByText("Veja em: ge");
     expect(sources.length).toBeGreaterThanOrEqual(1);
   });
 
