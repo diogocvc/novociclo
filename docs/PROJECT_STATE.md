@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 15/07/2026 (thumbnail, news no frontmatter, NoNewsToday, pipeline CI)
+**Última atualização:** 15/07/2026 (matriz de grupos, filtro por data, cleanup, título menor, overflow)
 
 ---
 
@@ -150,7 +150,7 @@ novo-ciclo/
 * ✅ GitHub Actions (test.yml, deploy.yml, daily.yml)
 * ✅ Configuração Vercel
 * ✅ Deploy publicado em novociclo.vercel.app
-* ✅ Testes automatizados (77 testes em 21 arquivos)
+* ✅ Testes automatizados (86 testes em 21 arquivos)
 * ✅ RSS parser real (src/lib/rss.ts com fast-xml-parser)
 * ✅ Pipeline end-to-end rodou com RSS real e backoff exponencial
 * ✅ Refinamento de prompts e docs dos agentes
@@ -159,10 +159,15 @@ novo-ciclo/
 * ✅ NoNewsToday para capítulos históricos (mensagem "não houve notícias neste dia" + link para último capítulo com notícias)
 * ✅ GitHub Actions daily.yml com `contents: write` (deploy.yml removido — substituído por Vercel Git Integration)
 * ✅ Capítulos 05-15 regenerados com thumbnails reais do RSS
+* ✅ Matriz de relevância por grupos (6 grupos positivos + exclusões por modalidade/outras seleções)
+* ✅ Filtro por data no Researcher (notícias até 3 dias antes da data alvo)
+* ✅ Validação pós-LLM com o mesmo filtro de relevância
+* ✅ Título do capítulo reduzido ~30% + break-words + ajuste layout da notícia em destaque
+* ✅ Script cleanup-chapters para re-aplicar filtro em capítulos existentes
 
 ## Próxima Iteração — Prioridade Alta
 
-* Refinar filtro de relevância do Researcher (exclusão por modalidade: vôlei, basquete, handebol, tênis)
+* Implementar busca (RF-08)
 
 ## Prioridade Média
 
@@ -240,9 +245,8 @@ Mitigação:
 O desenvolvimento da base do projeto está concluído. A aplicação está no ar.
 
 Os próximos passos são:
-1. Refinar filtro do Researcher (falsos positivos: vôlei, basquete, handebol, tênis)
-2. Implementar busca (RF-08)
-3. Newsletter com serviço real de envio
+1. Implementar busca (RF-08)
+2. Newsletter com serviço real de envio
 
 ---
 

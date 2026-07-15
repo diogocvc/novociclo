@@ -68,6 +68,9 @@ const EXCLUDED_KEYWORDS = [
   "fórmula 1", "formula 1", "f1",
   "mma", "boxe", "surfe", "skate",
   "liga das nações",
+  "série d", "série c", "série b",
+  "serie d", "serie c", "serie b",
+  "brasileirão série d", "brasileirao serie d",
   "seleção francesa", "seleção espanhola", "seleção argentina",
   "seleção inglesa", "seleção alemã", "seleção italiana",
   "seleção portuguesa", "seleção holandesa", "seleção belga",
@@ -151,7 +154,7 @@ function calculateScore(title: string, resumo: string): { score: number; matched
   return { score, matchedGroups };
 }
 
-function isRelevant(title: string, resumo?: string, url?: string): boolean {
+export function isRelevant(title: string, resumo?: string, url?: string): boolean {
   const safeResumo = (resumo ?? "").toLowerCase();
   const safeUrl = (url ?? "").toLowerCase();
   const text = `${title.toLowerCase()} ${safeResumo}`;
@@ -173,7 +176,17 @@ export class ResearcherAgent extends BaseAgent {
 
     try {
       const allRss = await fetchAllRss();
-      const relevantRss = allRss.filter((n) => isRelevant(n.titulo, n.resumo_original, n.url));
+      const targetEnd = new Date(input.date);
+      targetEnd.setHours(23, 59, 59, 999);
+      const threeDaysBefore = new Date(targetEnd);
+      threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
+
+      const relevantRss = allRss.filter((n) => {
+        if (!isRelevant(n.titulo, n.resumo_original, n.url)) return false;
+        const pubDate = new Date(n.data_publicacao);
+        if (isNaN(pubDate.getTime())) return true;
+        return pubDate >= threeDaysBefore && pubDate <= targetEnd;
+      });
       const topRss = relevantRss.slice(0, 8);
 
       if (topRss.length >= 3) {
