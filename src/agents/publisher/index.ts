@@ -2,17 +2,6 @@ import fs from "fs";
 import path from "path";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const PROMPT = `Você é o Publicador do Novo Ciclo.
-
-Sua missão é transformar o capítulo aprovado em um arquivo MDX pronto para o repositório.
-
-Regras:
-- Gere o arquivo MDX com frontmatter completo
-- Salve em content/YYYY/MM/DD.mdx
-- Atualize os índices necessários
-- O conteúdo nunca deve ser alterado nesta etapa`;
-
 export class PublisherAgent extends BaseAgent {
   constructor() {
     super("Publicador");

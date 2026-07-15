@@ -2,17 +2,6 @@ import fs from "fs";
 import path from "path";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const PROMPT = `Você é o Agente de SEO do Novo Ciclo.
-
-Sua missão é atualizar automaticamente todos os recursos necessários para indexação após a publicação de um novo capítulo.
-
-Regras:
-- Atualize o sitemap.xml
-- Atualize o feed RSS
-- Atualize o Open Graph do capítulo
-- Garanta que links estejam corretos`;
-
 export class SEOAgent extends BaseAgent {
   constructor() {
     super("SEO");

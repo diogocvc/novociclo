@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 14/07/2026
+**Última atualização:** 15/07/2026 (refinamento prompts)
 
 ---
 
@@ -85,7 +85,8 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Deploy Vercel**       | ✅ Concluído     |
 | **LLM (Groq)**          | ✅ Concluído     |
 | **Pipeline End-to-End** | ✅ Concluído     |
-| Testes                  | ⏳ Não iniciado  |
+| **Testes**              | ✅ Concluído     |
+| **Refinamento Prompts** | ✅ Concluído     |
 
 ---
 
@@ -145,20 +146,22 @@ novo-ciclo/
 * ✅ GitHub Actions (test.yml, deploy.yml, daily.yml)
 * ✅ Configuração Vercel
 * ✅ Deploy publicado em novociclo.vercel.app
+* ✅ Testes automatizados (77 testes em 21 arquivos)
+* ✅ RSS parser real (src/lib/rss.ts com fast-xml-parser)
+* ✅ Pipeline end-to-end rodou com RSS real e backoff exponencial
+* ✅ Refinamento de prompts e docs dos agentes
 
 ## Próxima Iteração — Prioridade Alta
 
 * Configurar GitHub Secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, LLM_API_KEY) — ação manual
-* Implementar testes automatizados
 
 ## Prioridade Média
 
-* Implementar busca
-* Configurar import-rss com fontes reais
-* Implementar newsletter com conteúdo real
+* Implementar busca (RF-08)
 
 ## Prioridade Baixa
 
+* Newsletter com serviço real de envio (Resend, SendGrid)
 * Páginas estáticas (Manifesto, Sobre, Créditos, Contato)
 * Registrar domínio próprio
 * Animações e refinamentos de UI
@@ -213,8 +216,8 @@ O desenvolvimento da base do projeto está concluído. A aplicação está no ar
 
 Os próximos passos são:
 1. Configurar secrets do GitHub (fora do escopo da IA — ação manual)
-2. Integrar API de LLM nos agentes
-3. Criar testes automatizados
+2. Implementar busca (RF-08)
+3. Newsletter com serviço real de envio
 
 ---
 

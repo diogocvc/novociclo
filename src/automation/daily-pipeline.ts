@@ -7,6 +7,7 @@ import { PublisherAgent } from "@/agents/publisher";
 import { NewsletterAgent } from "@/agents/newsletter";
 import { SEOAgent } from "@/agents/seo";
 import type { AgentInput, AgentOutput } from "@/agents/base";
+import { getCountdownData } from "@/lib/countdown";
 
 const MAX_RETRIES = 3;
 
@@ -22,6 +23,8 @@ interface PipelineResult {
   success: boolean;
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function retry(
   fn: () => Promise<AgentOutput>,
   agentName: string,
@@ -31,9 +34,11 @@ async function retry(
     const result = await fn();
     if (result.success) return result;
     if (attempt < maxRetries) {
+      const delayMs = attempt * 2000;
       console.log(
-        `[Pipeline] ${agentName} falhou (tentativa ${attempt}/${maxRetries}). Reexecutando...`
+        `[Pipeline] ${agentName} falhou (tentativa ${attempt}/${maxRetries}). Reexecutando em ${delayMs}ms...`
       );
+      await sleep(delayMs);
     }
   }
   return { success: false, error: `${agentName} excedeu o limite de tentativas` };
@@ -51,7 +56,14 @@ export async function runDailyPipeline(
 
   console.log(`\n=== Pipeline Diário: ${date.toISOString()} ===\n`);
 
-  const input: AgentInput = { date };
+  const countdown = getCountdownData(date);
+  const ciclo = {
+    numero_dia: countdown.daysElapsed,
+    total_dias: countdown.totalDays,
+    dias_restantes: countdown.daysRemaining,
+  };
+
+  const input: AgentInput = { date, ciclo };
 
   const researcher = new ResearcherAgent();
   const curator = new CuratorAgent();
@@ -88,6 +100,8 @@ export async function runDailyPipeline(
     step("Revisor", () => {
       const writerOutput = result.outputs[3]?.data as { draft?: unknown } | undefined;
       input.draft = writerOutput?.draft;
+      input.events = (result.outputs[1]?.data as { events?: unknown } | undefined)?.events;
+      input.decision = (result.outputs[2]?.data as { decision?: unknown } | undefined)?.decision;
       return retry(() => reviewer.execute(input), "Revisor");
     }),
     step("Publicador", () => {

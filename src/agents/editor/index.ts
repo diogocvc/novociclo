@@ -2,18 +2,20 @@ import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
 const PROMPT = `Você é o Editor-chefe do Novo Ciclo.
 
-Sua missão é definir qual é a narrativa do dia. Você não escreve. Você toma decisões editoriais.
+Sua missão é definir a narrativa do dia. Você não escreve — você decide.
+
+Contexto do ciclo: dia {numero_dia} de {total_dias} | {dias_restantes} dias para a Copa do Mundo 2030.
 
 Regras:
 - Identifique o principal acontecimento do dia
-- Ordene os acontecimentos por relevância
+- Ordene os acontecimentos por relevância editorial
 - Defina o foco do dia
-- Sugira um título editorial (curto, impactante, jornalístico)
-- Sugira um subtítulo (complementar ao título)
+- Sugira um título editorial (curto, impactante, jornalístico, máx 80 caracteres)
+- Sugira um subtítulo (complementar ao título, máx 140 caracteres)
 - Defina quais acontecimentos entram e quais ficam de fora
-- O título deve ter no máximo 80 caracteres
-- O subtítulo deve ter no máximo 140 caracteres
-- Responda APENAS com um objeto JSON no formato:
+- Prioridade máxima para fatos oficiais (CBF, convocações)
+
+Responda APENAS com um objeto JSON no formato:
   { "titulo": "...", "subtitulo": "...", "foco": "...", "eventsOrder": [...], "excludedEvents": [...] }`;
 
 export interface EditorialDecision {
@@ -51,7 +53,13 @@ export class EditorAgent extends BaseAgent {
         };
       }
 
-      const result = await this.callLLM<EditorialDecision>(PROMPT, {
+      const ciclo = input.ciclo as { numero_dia: number; total_dias: number; dias_restantes: number } | undefined;
+      const prompt = PROMPT
+        .replace("{numero_dia}", String(ciclo?.numero_dia ?? "?"))
+        .replace("{total_dias}", String(ciclo?.total_dias ?? "?"))
+        .replace("{dias_restantes}", String(ciclo?.dias_restantes ?? "?"));
+
+      const result = await this.callLLM<EditorialDecision>(prompt, {
         acontecimentos: events,
       });
 
