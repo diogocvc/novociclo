@@ -109,6 +109,8 @@ export async function runDailyPipeline(
       if (!reviewerOutput?.review?.approved) {
         return Promise.resolve({ success: false, error: "Capítulo não aprovado na revisão" });
       }
+      const researcherOutput = result.outputs[0]?.data as { news?: unknown } | undefined;
+      input.news = researcherOutput?.news;
       return retry(() => publisher.execute(input), "Publicador");
     }),
     step("Newsletter", () => {

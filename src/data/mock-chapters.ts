@@ -18,13 +18,16 @@ function buildChapter(raw: ReturnType<typeof getAllChapters>[number]): Chapter {
     data_publicacao: raw.data,
     tempo_de_leitura: raw.tempo_de_leitura,
     frontmatter: {},
-    noticia_destaque: raw.noticia_destaque_id
-      ? mockNews[raw.noticia_destaque_id]
-      : undefined,
-    noticias_referencia:
+    noticia_destaque: raw.noticia_destaque ?? (
+      raw.noticia_destaque_id
+        ? mockNews[raw.noticia_destaque_id]
+        : undefined
+    ),
+    noticias_referencia: raw.noticias_referencia ?? (
       raw.noticias_referencia_ids
         ?.map((id) => mockNews[id])
-        .filter(Boolean) ?? [],
+        .filter(Boolean) ?? []
+    ),
   };
 }
 

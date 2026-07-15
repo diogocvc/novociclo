@@ -17,6 +17,30 @@ interface RawFrontmatter {
   referencias: string[];
   noticia_destaque_id?: string;
   noticias_referencia_ids?: string[];
+  noticia_destaque?: {
+    id: string;
+    titulo: string;
+    resumo_original: string;
+    url: string;
+    thumbnail?: string;
+    fonte: string;
+    autor?: string;
+    data_publicacao: string;
+    idioma: string;
+    data_coleta: string;
+  };
+  noticias_referencia?: Array<{
+    id: string;
+    titulo: string;
+    resumo_original: string;
+    url: string;
+    thumbnail?: string;
+    fonte: string;
+    autor?: string;
+    data_publicacao: string;
+    idioma: string;
+    data_coleta: string;
+  }>;
   tempo_de_leitura: number;
 }
 
