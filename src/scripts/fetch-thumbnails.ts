@@ -40,7 +40,7 @@ async function extractImageFromUrl(url: string): Promise<string | null> {
     const patterns = [
       /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
       /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
-      /<figure[^>]*class=["'][^"']*thumbnail[^"']*["'][^>]*>.*?<img[^>]+src=["']([^"']+)["']/is,
+      /<figure[^>]*class=["'][^"']*thumbnail[^"']*["'][^>]*>.*?<img[^>]+src=["']([^"']+)["']/i,
       /<img[^>]+src=["']([^"']+)["'][^>]*>/i,
     ];
 
