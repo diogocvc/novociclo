@@ -8,13 +8,21 @@ const RELEVANCE_KEYWORDS = [
   "copa 2030", "novo ciclo",
 ];
 
+const EXCLUDED_KEYWORDS = [
+  "vôlei", "volei", "voley", "voleibol",
+  "basquete", "basquetebol", "nba",
+  "handebol", "handball",
+  "tênis", "tenis",
+];
+
 const PROMPT = `Você é o Pesquisador do Novo Ciclo (modo fallback).
 
 ATENÇÃO: Você está sendo acionado porque a coleta via RSS retornou poucas notícias relevantes sobre a Seleção Brasileira. Sua missão é complementar com notícias factuais e realistas sobre a caminhada da Seleção rumo à Copa do Mundo de 2030.
 
 Regras:
 - Gera de 3 a 8 notícias factuais e realistas
-- Foco exclusivo em: Seleção Brasileira, jogadores, CBF, comissão técnica, Copa 2030
+- Foco exclusivo em: Seleção Brasileira de Futebol, jogadores, CBF, comissão técnica, Copa 2030
+- NÃO inclua notícias de outras modalidades (vôlei, basquete, handebol, tênis, etc.)
 - Cada notícia deve ter: id, titulo, resumo_original, url, fonte, data_publicacao, idioma, data_coleta
 - Fontes possíveis: ge.globo.com, uol.com.br, espn.com.br, cbf.com.br
 - URLs devem seguir o padrão real dos domínios
@@ -23,9 +31,16 @@ Regras:
 - NÃO inclua opinião pessoal
 - Responda APENAS com um objeto JSON no formato: { "news": [...] }`;
 
-function isRelevant(title: string): boolean {
-  const lower = title.toLowerCase();
-  return RELEVANCE_KEYWORDS.some((kw) => lower.includes(kw));
+function isRelevant(title: string, resumo?: string): boolean {
+  const lowerTitle = title.toLowerCase();
+  const lowerResumo = resumo?.toLowerCase() ?? "";
+
+  const hasExcluded = EXCLUDED_KEYWORDS.some(
+    (kw) => lowerTitle.includes(kw) || lowerResumo.includes(kw),
+  );
+  if (hasExcluded) return false;
+
+  return RELEVANCE_KEYWORDS.some((kw) => lowerTitle.includes(kw));
 }
 
 export class ResearcherAgent extends BaseAgent {
@@ -39,7 +54,7 @@ export class ResearcherAgent extends BaseAgent {
 
     try {
       const allRss = await fetchAllRss();
-      const relevantRss = allRss.filter((n) => isRelevant(n.titulo));
+      const relevantRss = allRss.filter((n) => isRelevant(n.titulo, n.resumo_original));
       const topRss = relevantRss.slice(0, 8);
 
       if (topRss.length >= 3) {

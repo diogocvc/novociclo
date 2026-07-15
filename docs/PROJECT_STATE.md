@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 15/07/2026 (refinamento prompts)
+**Última atualização:** 15/07/2026 (thumbnail, news no frontmatter, NoNewsToday, pipeline CI)
 
 ---
 
@@ -87,6 +87,10 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Pipeline End-to-End** | ✅ Concluído     |
 | **Testes**              | ✅ Concluído     |
 | **Refinamento Prompts** | ✅ Concluído     |
+| **News no Frontmatter** | ✅ Concluído     |
+| **Thumbnails RSS**      | ✅ Concluído     |
+| **NoNewsToday**         | ✅ Concluído     |
+| **CI/CD Pipeline**      | ✅ Concluído     |
 
 ---
 
@@ -102,9 +106,9 @@ novo-ciclo/
 │   ├── home/               → WeeklyNavigation, WeekArchive
 │   └── chapter/            → ChapterContent, NewsCard
 ├── content/                → Capítulos em MDX
-│   └── 2026/07/            → 13.mdx, 14.mdx
+│   └── 2026/07/            → 05-15.mdx
 ├── config/                 → cycle.ts, sources.ts, categories.ts
-├── lib/                    → date.ts, countdown.ts, reading-time.ts, content.ts
+├── lib/                    → date.ts, countdown.ts, reading-time.ts, content.ts, rss.ts
 ├── types/                  → index.ts (News, Event, Chapter, Source, Category)
 ├── data/                   → mock-chapters.ts, mock-news.ts
 ├── agents/                 → 8 agentes editoriais
@@ -119,7 +123,7 @@ novo-ciclo/
 │   └── seo/
 ├── automation/             → daily-pipeline.ts
 ├── scripts/                → create-post, import-rss, generate-sitemap, backup
-├── .github/workflows/      → test.yml, deploy.yml, daily.yml
+├── .github/workflows/      → test.yml, daily.yml
 └── vercel.json
 ```
 
@@ -150,10 +154,15 @@ novo-ciclo/
 * ✅ RSS parser real (src/lib/rss.ts com fast-xml-parser)
 * ✅ Pipeline end-to-end rodou com RSS real e backoff exponencial
 * ✅ Refinamento de prompts e docs dos agentes
+* ✅ News no frontmatter (Publisher escreve noticia_destaque/noticias_referencia via js-yaml)
+* ✅ Thumbnails extraídos do RSS (105/115 artigos via media:content + fallback HTML)
+* ✅ NoNewsToday para capítulos históricos (mensagem "não houve notícias neste dia" + link para último capítulo com notícias)
+* ✅ GitHub Actions daily.yml com `contents: write` (deploy.yml removido — substituído por Vercel Git Integration)
+* ✅ Capítulos 05-15 regenerados com thumbnails reais do RSS
 
 ## Próxima Iteração — Prioridade Alta
 
-* Configurar GitHub Secrets (VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, LLM_API_KEY) — ação manual
+* Refinar filtro de relevância do Researcher (exclusão por modalidade: vôlei, basquete, handebol, tênis)
 
 ## Prioridade Média
 
@@ -194,9 +203,25 @@ Manter múltiplas fontes configuradas e monitoramento de falhas.
 
 ---
 
+## Rate limit da Groq (12.000 TPM)
+
+O free tier da Groq tem limite de 12.000 tokens/minuto. O pipeline consome ~12-15K tokens por execução completa.
+
+Impacto:
+
+Alto — pode interromper a geração em dias com muitos artigos relevantes.
+
+Mitigação:
+
+* Usar modelo 8B (mais rápido, menos tokens) como fallback.
+* Pular agente Revisor quando o rate limit estiver próximo.
+* Configurar janela de execução espaçada (já implementado: backoff exponencial).
+
+---
+
 ## Dependência de API de IA
 
-O pipeline diário depende de uma API externa (OpenAI/Anthropic) para gerar conteúdo.
+O pipeline diário depende de uma API externa (Groq) para gerar conteúdo.
 
 Impacto:
 
@@ -215,7 +240,7 @@ Mitigação:
 O desenvolvimento da base do projeto está concluído. A aplicação está no ar.
 
 Os próximos passos são:
-1. Configurar secrets do GitHub (fora do escopo da IA — ação manual)
+1. Refinar filtro do Researcher (falsos positivos: vôlei, basquete, handebol, tênis)
 2. Implementar busca (RF-08)
 3. Newsletter com serviço real de envio
 

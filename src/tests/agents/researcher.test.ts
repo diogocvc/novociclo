@@ -66,6 +66,50 @@ describe("ResearcherAgent", () => {
     expect(mockCallLLM).toHaveBeenCalledTimes(1);
   });
 
+  it("excludes articles from other sports (volleyball, basketball, handball, tennis)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      makeNews("n1", "Seleção Brasileira de Vôlei vence campeonato"),
+      makeNews("n2", "Brasil enfrenta EUA no basquete hoje"),
+      makeNews("n3", "Seleção Brasileira de handebol é campeã"),
+      makeNews("n4", "Brasil avança no tênis em Roland Garros"),
+      makeNews("n5", "Seleção Brasileira de futebol vence amistoso"),
+      makeNews("n6", "CBF anuncia amistoso para setembro"),
+    ]);
+
+    mockCallLLM.mockResolvedValueOnce({
+      content: { news: [makeNews("n7", "Brasil se prepara para 2030")] },
+      tokens: { prompt: 10, completion: 20, total: 30 },
+    });
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: unknown[] }).news;
+    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    expect(titles).not.toContain("Seleção Brasileira de Vôlei vence campeonato");
+    expect(titles).not.toContain("Brasil enfrenta EUA no basquete hoje");
+    expect(titles).not.toContain("Seleção Brasileira de handebol é campeã");
+    expect(titles).not.toContain("Brasil avança no tênis em Roland Garros");
+  });
+
+  it("excludes articles with other sports in the summary", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews("n1", "Brasil conquista medalha"),
+        resumo_original: "A seleção brasileira de vôlei venceu mais uma",
+      },
+      makeNews("n2", "Seleção Brasileira de futebol vence amistoso"),
+      makeNews("n3", "CBF anuncia novo técnico"),
+      makeNews("n4", "Neymar é convocado"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: unknown[] }).news;
+    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    expect(titles).not.toContain("Brasil conquista medalha");
+    expect(titles).toContain("Seleção Brasileira de futebol vence amistoso");
+  });
+
   it("returns error when RSS and LLM both fail", async () => {
     mockFetchAllRss.mockResolvedValueOnce([]);
     mockCallLLM.mockRejectedValueOnce(new Error("LLM error"));
