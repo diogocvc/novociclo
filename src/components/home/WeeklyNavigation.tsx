@@ -1,19 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
 
 type DayState = "disabled" | "today" | "active" | "empty";
-
-interface DayCard {
-  label: string;
-  day: number;
-  date: Date;
-  state: DayState;
-  slug?: string;
-}
 
 interface Props {
   currentDate?: Date;
@@ -24,13 +16,11 @@ export default function WeeklyNavigation({
   currentDate,
   publishedSlugs = [],
 }: Props) {
-  const [weekDays, setWeekDays] = useState<DayCard[]>([]);
-
-  useEffect(() => {
+  const weekDays = useMemo(() => {
     const reference = currentDate ?? new Date();
     const weekStart = startOfWeek(reference, { weekStartsOn: 1 });
     const today = new Date();
-    const days: DayCard[] = Array.from({ length: 7 }, (_, i) => {
+    return Array.from({ length: 7 }, (_, i) => {
       const date = addDays(weekStart, i);
       const y = date.getFullYear();
       const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -57,7 +47,6 @@ export default function WeeklyNavigation({
         slug: state === "active" ? `/${slug}` : undefined,
       };
     });
-    setWeekDays(days);
   }, [currentDate, publishedSlugs]);
 
   if (weekDays.length === 0) return null;

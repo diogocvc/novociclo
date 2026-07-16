@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 15/07/2026 (backfill dos capítulos 05-13 com notícias reais de cada data)
+**Última atualização:** 15/07/2026 (páginas estáticas Sobre/Créditos/Contato, navegação global, citação do Ancelotti na home)
 
 ---
 
@@ -78,6 +78,7 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Componentes Layout**  | ✅ Concluído     |
 | **Página Home**         | ✅ Concluído     |
 | **Página Capítulo**     | ✅ Concluído     |
+| **Páginas Estáticas**   | ✅ Concluído     |
 | **Sistema MDX**         | ✅ Concluído     |
 | **Scripts Automação**   | ✅ Concluído     |
 | **Agentes (base)**      | ✅ Concluído     |
@@ -100,6 +101,9 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 novo-ciclo/
 ├── app/                    → Next.js App Router
 │   ├── page.tsx            → Home (último capítulo)
+│   ├── sobre/              → Sobre o projeto
+│   ├── creditos/           → Créditos
+│   ├── contato/            → Contato
 │   └── [ano]/[mes]/[dia]/  → Capítulo individual
 ├── components/
 │   ├── layout/             → Header, Footer, CountdownBanner
@@ -167,6 +171,10 @@ novo-ciclo/
 * ✅ Backfill dos capítulos 05-13 com notícias reais por data (web search real ge.globo.com, UOL, Folha, BBC, Estadão, Exame)
 * ✅ Capítulos 07, 08, 09, 10, 13 criados (estavam faltando) com narrativas baseadas em notícias reais
 * ✅ Script backfill-news.ts com dados estruturados de +20 artigos reais
+* ✅ Páginas estáticas /sobre, /creditos, /contato (manifesto removido)
+* ✅ Header: componente client-side com navegação desktop + overlay mobile
+* ✅ Footer com links para páginas estáticas
+* ✅ Citação do Ancelotti exibida na home (sem fundo branco, centralizada)
 
 ## Próxima Iteração — Prioridade Alta
 
@@ -179,7 +187,6 @@ novo-ciclo/
 ## Prioridade Baixa
 
 * Newsletter com serviço real de envio (Resend, SendGrid)
-* Páginas estáticas (Manifesto, Sobre, Créditos, Contato)
 * Registrar domínio próprio
 * Animações e refinamentos de UI
 

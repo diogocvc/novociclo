@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Trophy } from "lucide-react";
-import type { CountdownData } from "@/types";
 import { getCountdownData } from "@/lib/countdown";
 
 export default function CountdownBanner() {
-  const [data, setData] = useState<CountdownData | null>(null);
-
-  useEffect(() => {
-    setData(getCountdownData());
-  }, []);
+  const [data] = useState(() => getCountdownData());
 
   if (!data) {
     return (

@@ -628,7 +628,7 @@ function main(): void {
   const sortedDays = Object.keys(articles).sort();
   let updated = 0;
   let created = 0;
-  let skipped = 0;
+  const skipped = 0;
 
   for (const day of sortedDays) {
     const filePath = path.join(contentDir, `${day}.mdx`);

@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { Chapter } from "@/types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -42,10 +41,6 @@ interface RawFrontmatter {
     data_coleta: string;
   }>;
   tempo_de_leitura: number;
-}
-
-function parseDate(dateStr: string): string {
-  return dateStr;
 }
 
 function collectMdxFiles(dir: string): string[] {

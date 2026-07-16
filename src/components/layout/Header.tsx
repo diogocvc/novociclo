@@ -14,9 +14,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
     if (menuOpen) {
@@ -70,11 +68,11 @@ export default function Header() {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="absolute inset-0 bg-black/40"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
           />
           <nav className="absolute top-0 right-0 w-72 h-full bg-white shadow-lg flex flex-col pt-24 px-8">
             <button
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               className="absolute top-6 right-6 w-10 h-10 rounded-full bg-green-primary flex items-center justify-center"
               aria-label="Fechar menu"
             >
@@ -86,6 +84,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={closeMenu}
                   className={`text-base uppercase tracking-wider py-4 border-b border-gray-light transition-colors ${
                     isActive
                       ? "text-green-primary font-semibold"

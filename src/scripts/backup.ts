@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
 
 const ROOT_DIR = process.cwd();
 const BACKUP_DIR = path.join(ROOT_DIR, ".backups");

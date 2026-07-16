@@ -80,12 +80,12 @@ export default function SobrePage() {
             A origem do nome
           </h2>
           <p className="text-lg leading-relaxed text-text/80">
-            O nome "Novo Ciclo" nasceu de uma declaração de Carlo Ancelotti. Na
+            O nome &quot;Novo Ciclo&quot; nasceu de uma declaração de Carlo Ancelotti. Na
             noite de 5 de julho de 2026, minutos após a eliminação do Brasil
             para a Noruega na Copa do Mundo, o técnico italiano disse:
           </p>
           <blockquote className="mt-4 p-4 bg-white rounded-md border-l-4 border-green-primary italic text-text/70">
-            "Não é o fim, é o início de um novo ciclo."
+            &quot;Não é o fim, é o início de um novo ciclo.&quot;
           </blockquote>
           <p className="text-lg leading-relaxed text-text/80 mt-4">
             Aquela frase resumia o sentimento de um país que precisava
