@@ -24,10 +24,11 @@ jobs:
           NEXT_PUBLIC_CYCLE_START_DATE: ${{ vars.NEXT_PUBLIC_CYCLE_START_DATE || '2026-07-05T00:00:00-03:00' }}
           NEXT_PUBLIC_WORLD_CUP_DATE: ${{ vars.NEXT_PUBLIC_WORLD_CUP_DATE || '2030-06-11T00:00:00-03:00' }}
           NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID || 'G-T9J81CXJ2E' }}
-      - run: |
+      - if: success()
+        run: |
           git config user.name "Novo Ciclo Bot"
           git config user.email "bot@novociclo.app"
-          git pull --rebase
           git add content/ public/rss.xml
           git commit -m "chore: daily pipeline $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git pull --rebase
           git push
