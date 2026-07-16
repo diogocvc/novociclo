@@ -12,6 +12,10 @@ describe("SEOAgent", () => {
   beforeEach(() => {
     agent = new SEOAgent();
     vi.spyOn(process, "cwd").mockReturnValue(path.resolve(__dirname, "../fixtures"));
+    const publicDir = path.resolve(__dirname, "../fixtures/public");
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
   });
 
   afterEach(() => {
