@@ -1,6 +1,9 @@
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 import type { News } from "@/types";
 import { fetchAllRss } from "@/lib/rss";
+import rawBlocklist from "@/config/news-blocklist.json";
+
+const blocklist = rawBlocklist as { urls: string[]; keywords: string[] };
 
 type Group = {
   name: string;
@@ -67,15 +70,21 @@ const EXCLUDED_KEYWORDS = [
   "atletismo", "ginástica", "ginastica",
   "fórmula 1", "formula 1", "f1",
   "mma", "boxe", "surfe", "skate",
+  "futsal",
+  "futebol de areia",
+  "futebol feminino",
   "liga das nações",
-  "série d", "série c", "série b",
-  "serie d", "serie c", "serie b",
-  "brasileirão série d", "brasileirao serie d",
+  "série a", "série b", "série c", "série d",
+  "serie a", "serie b", "serie c", "serie d",
+  "brasileirão", "brasileirao",
+  "libertadores",
+  "copa do brasil",
   "seleção francesa", "seleção espanhola", "seleção argentina",
   "seleção inglesa", "seleção alemã", "seleção italiana",
   "seleção portuguesa", "seleção holandesa", "seleção belga",
   "seleção da frança", "seleção da espanha", "seleção da argentina",
   "presidente da frança", "presidente da espanha",
+  "botafogo", "ferroviário",
 ];
 
 const EXCLUDED_URL_PATTERNS = [
@@ -165,6 +174,17 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   return score >= 3 || matchedGroups >= 2;
 }
 
+function isBlocked(title: string, resumo?: string, url?: string): boolean {
+  const safeResumo = (resumo ?? "").toLowerCase();
+  const safeUrl = (url ?? "").toLowerCase();
+  const text = `${title.toLowerCase()} ${safeResumo}`;
+
+  if (safeUrl && blocklist.urls.some((u) => safeUrl.includes(u))) return true;
+  if (blocklist.keywords.some((kw) => text.includes(kw.toLowerCase()))) return true;
+
+  return false;
+}
+
 export class ResearcherAgent extends BaseAgent {
   constructor() {
     super("Pesquisador");
@@ -187,10 +207,11 @@ export class ResearcherAgent extends BaseAgent {
         if (isNaN(pubDate.getTime())) return true;
         return pubDate >= threeDaysBefore && pubDate <= targetEnd;
       });
-      const topRss = relevantRss.slice(0, 8);
+      const cleanRss = relevantRss.filter((n) => !isBlocked(n.titulo, n.resumo_original, n.url));
+      const topRss = cleanRss.slice(0, 8);
 
       if (topRss.length >= 3) {
-        this.log(`RSS: ${allRss.length} total, ${relevantRss.length} relevantes, ${topRss.length} selecionadas`);
+        this.log(`RSS: ${allRss.length} total, ${relevantRss.length} relevantes, ${relevantRss.length - cleanRss.length} bloqueadas, ${topRss.length} selecionadas`);
         return {
           success: true,
           data: { news: topRss, source: "rss" },

@@ -15,6 +15,7 @@
     "scripts:backfill": "tsx src/scripts/backfill-news.ts",
     "scripts:thumbnails": "tsx src/scripts/fetch-thumbnails.ts",
     "scripts:backup": "tsx src/scripts/backup.ts",
+    "scripts:block-news": "tsx src/scripts/block-news.ts",
     "pipeline": "tsx src/automation/daily-pipeline.ts",
     "test": "vitest run",
     "test:watch": "vitest",
