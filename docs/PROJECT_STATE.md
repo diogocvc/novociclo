@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 15/07/2026 (páginas estáticas Sobre/Créditos/Contato, navegação global, citação do Ancelotti na home)
+**Última atualização:** 16/07/2026 (cooldown LLM, blocklist de notícias, GA, lint zerado)
 
 ---
 
@@ -92,6 +92,10 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Thumbnails RSS**      | ✅ Concluído     |
 | **NoNewsToday**         | ✅ Concluído     |
 | **CI/CD Pipeline**      | ✅ Concluído     |
+| **Cooldown LLM**        | ✅ Concluído     |
+| **Blocklist Notícias**  | ✅ Concluído     |
+| **Google Analytics**    | ✅ Concluído     |
+| **Lint Zero**           | ✅ Concluído     |
 
 ---
 
@@ -126,7 +130,7 @@ novo-ciclo/
 │   ├── newsletter/
 │   └── seo/
 ├── automation/             → daily-pipeline.ts
-├── scripts/                → create-post, import-rss, generate-sitemap, backup, cleanup-chapters, backfill-news
+├── scripts/                → create-post, import-rss, generate-sitemap, backup, cleanup-chapters, backfill-news, fetch-thumbnails, block-news
 ├── .github/workflows/      → test.yml, daily.yml
 └── vercel.json
 ```
@@ -175,6 +179,14 @@ novo-ciclo/
 * ✅ Header: componente client-side com navegação desktop + overlay mobile
 * ✅ Footer com links para páginas estáticas
 * ✅ Citação do Ancelotti exibida na home (sem fundo branco, centralizada)
+* ✅ Cooldown de 65s entre chamadas LLM + retry inteligente para 429 (rate limit Groq resolvido)
+* ✅ js-yaml como dependência direta (era transitiva)
+* ✅ Google Analytics via next/script (NEXT_PUBLIC_GA_ID)
+* ✅ Blocklist persistente (news-blocklist.json) para bloqueio manual de falsos positivos
+* ✅ Script `scripts:block-news` para adicionar URLs/keywords ao blocklist
+* ✅ Researcher ignora itens bloqueados e busca próximos do RSS
+* ✅ Lint zerado (8 erros corrigidos: unescaped entities, setState em effect, unused imports/vars)
+* ✅ Testes e typecheck passando (86 testes, 0 erros)
 
 ## Próxima Iteração — Prioridade Alta
 
@@ -228,9 +240,8 @@ Alto — pode interromper a geração em dias com muitos artigos relevantes.
 
 Mitigação:
 
-* Usar modelo 8B (mais rápido, menos tokens) como fallback.
-* Pular agente Revisor quando o rate limit estiver próximo.
-* Configurar janela de execução espaçada (já implementado: backoff exponencial).
+* Cooldown de 65 segundos entre chamadas LLM no pipeline (implementado)
+* Retry inteligente que parseia Retry-After do erro 429 e espera o tempo necessário
 
 ---
 
