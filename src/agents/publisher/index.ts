@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
 
 interface NewsItem {
@@ -22,7 +22,7 @@ function buildFrontmatter(fields: Record<string, unknown>): string {
       clean[key] = value;
     }
   }
-  return yaml.dump(clean, { lineWidth: 120, quotingType: '"' });
+  return yaml.dump(clean, { lineWidth: 120, quoteStyle: "double" });
 }
 
 export class PublisherAgent extends BaseAgent {

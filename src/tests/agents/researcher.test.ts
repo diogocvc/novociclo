@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { MockedFunction } from "vitest";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);
@@ -16,8 +15,8 @@ import { ResearcherAgent } from "@/agents/researcher";
 import { callLLM } from "@/lib/llm";
 import { fetchAllRss } from "@/lib/rss";
 
-const mockCallLLM = callLLM as MockedFunction<typeof callLLM>;
-const mockFetchAllRss = fetchAllRss as MockedFunction<typeof fetchAllRss>;
+const mockCallLLM = vi.mocked(callLLM);
+const mockFetchAllRss = vi.mocked(fetchAllRss);
 
 const makeNews = (id: string, titulo: string, url?: string) => ({
   id,
@@ -82,8 +81,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).not.toContain("Seleção Brasileira de Vôlei vence campeonato");
     expect(titles).not.toContain("Brasil enfrenta EUA no basquete hoje");
     expect(titles).not.toContain("Seleção Brasileira de handebol é campeã");
@@ -105,8 +104,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).not.toContain("Brasil conquista medalha");
     expect(titles).toContain("Seleção Brasileira de futebol vence amistoso");
   });
@@ -119,8 +118,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).not.toContain("CBF divulga tabela detalhada das oitavas de final da Série D");
     expect(titles).toContain("Seleção Brasileira enfrenta Argentina nas Eliminatórias");
   });
@@ -134,8 +133,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).not.toContain("Presidente da França parabeniza seleção após eliminação na Copa");
     expect(titles).not.toContain("Espanha é segunda seleção a chegar em final de Copa");
     expect(titles).toContain("CBF traça objetivos da Seleção até 2030");
@@ -149,8 +148,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).toContain("FIFA define novas regras para a Copa do Mundo");
     expect(titles).toContain("FIFA anuncia calendário de eliminatórias");
   });
@@ -163,8 +162,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).toContain("Uruguai prepara estádios para a Copa do Mundo 2030");
     expect(titles).toContain("Seleção Brasileira inicia preparação para Eliminatórias");
   });
@@ -177,8 +176,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).not.toContain("Brasil vence França");
     expect(titles).toContain("Seleção Brasileira vence amistoso");
   });
@@ -200,8 +199,8 @@ describe("ResearcherAgent", () => {
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    const news = (result.data as { news: unknown[] }).news;
-    const titles = news.map((n: Record<string, unknown>) => n.titulo as string);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
     expect(titles).toContain("Seleção Brasileira renovada para 2030");
     expect(titles).not.toContain("França elimina Espanha na semifinal da Copa");
   });

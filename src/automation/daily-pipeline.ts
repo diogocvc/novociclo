@@ -10,6 +10,9 @@ import type { AgentInput, AgentOutput } from "@/agents/base";
 import { getCountdownData } from "@/lib/countdown";
 
 const MAX_RETRIES = 3;
+const LLM_COOLDOWN_MS = 65_000;
+
+let lastLlmCompletion = 0;
 
 interface PipelineResult {
   date: string;
@@ -25,6 +28,24 @@ interface PipelineResult {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+async function waitForLlmCooldown() {
+  if (lastLlmCompletion === 0) return;
+  const elapsed = Date.now() - lastLlmCompletion;
+  if (elapsed < LLM_COOLDOWN_MS) {
+    const waitMs = LLM_COOLDOWN_MS - elapsed;
+    console.log(`[Pipeline] 🕐 Aguardando ${waitMs}ms (cooldown LLM)...`);
+    await sleep(waitMs);
+  }
+}
+
+function extractRetryAfterMs(errorMessage: string): number | null {
+  const match = errorMessage.match(/try again in ([\d.]+)s/);
+  if (match) {
+    return Math.ceil(parseFloat(match[1]) * 1000) + 1000;
+  }
+  return null;
+}
+
 async function retry(
   fn: () => Promise<AgentOutput>,
   agentName: string,
@@ -34,7 +55,8 @@ async function retry(
     const result = await fn();
     if (result.success) return result;
     if (attempt < maxRetries) {
-      const delayMs = attempt * 2000;
+      const retryAfter = result.error ? extractRetryAfterMs(result.error) : null;
+      const delayMs = retryAfter ?? (attempt * 2000);
       console.log(
         `[Pipeline] ${agentName} falhou (tentativa ${attempt}/${maxRetries}). Reexecutando em ${delayMs}ms...`
       );
@@ -81,23 +103,27 @@ export async function runDailyPipeline(
 
   const steps = [
     step("Pesquisador", () => retry(() => researcher.execute(input), "Pesquisador")),
-    step("Curador", () => {
+    step("Curador", async () => {
+      await waitForLlmCooldown();
       const prev = result.outputs[0]?.data as { news?: unknown } | undefined;
       input.news = prev?.news;
       return retry(() => curator.execute(input), "Curador");
     }),
-    step("Editor-chefe", () => {
+    step("Editor-chefe", async () => {
+      await waitForLlmCooldown();
       const prev = result.outputs[1]?.data as { events?: unknown } | undefined;
       input.events = prev?.events;
       return retry(() => editor.execute(input), "Editor-chefe");
     }),
-    step("Escritor", () => {
+    step("Escritor", async () => {
+      await waitForLlmCooldown();
       const editorOutput = result.outputs[2]?.data as { decision?: unknown } | undefined;
       input.decision = editorOutput?.decision;
       input.events = (result.outputs[1]?.data as { events?: unknown } | undefined)?.events;
       return retry(() => writer.execute(input), "Escritor");
     }),
-    step("Revisor", () => {
+    step("Revisor", async () => {
+      await waitForLlmCooldown();
       const writerOutput = result.outputs[3]?.data as { draft?: unknown } | undefined;
       input.draft = writerOutput?.draft;
       input.events = (result.outputs[1]?.data as { events?: unknown } | undefined)?.events;
@@ -125,6 +151,8 @@ export async function runDailyPipeline(
     }),
   ];
 
+  const llmSteps = new Set(["Pesquisador", "Curador", "Editor-chefe", "Escritor", "Revisor"]);
+
   for (const s of steps) {
     const start = Date.now();
     let output: AgentOutput = { success: false, error: "Step not executed" };
@@ -146,6 +174,10 @@ export async function runDailyPipeline(
       durationMs,
     });
     result.outputs.push(output);
+
+    if (output.success && llmSteps.has(s.name)) {
+      lastLlmCompletion = Date.now();
+    }
 
     if (!output.success) {
       result.success = false;

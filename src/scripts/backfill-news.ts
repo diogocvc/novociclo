@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import matter from "gray-matter";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -579,7 +579,7 @@ function buildFrontmatter(fields: Record<string, unknown>): string {
       clean[key] = value;
     }
   }
-  return yaml.dump(clean, { lineWidth: 120, quotingType: '"' });
+  return yaml.dump(clean, { lineWidth: 120, quoteStyle: "double" });
 }
 
 function writeMdxFile(filePath: string, day: string, data: ChapterData): void {
