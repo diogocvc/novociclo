@@ -1,6 +1,7 @@
 export interface News {
   id: string;
   titulo: string;
+  subtitulo?: string;
   resumo_original: string;
   url: string;
   thumbnail?: string;

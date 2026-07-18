@@ -29,6 +29,7 @@ interface RssItem {
   link?: string | { "@_href"?: string };
   description?: string | { "#cdata"?: string };
   "content:encoded"?: string | { "#cdata"?: string };
+  "atom:subtitle"?: string | { "#cdata"?: string };
   pubDate?: string;
   published?: string;
   "media:content"?: { "@_url"?: string };
@@ -74,6 +75,7 @@ function parseRssItems(channel: RssChannel): RawNews[] {
     title: extractText(item.title),
     link: extractLink(item),
     description: extractText(item.description || item["content:encoded"]),
+    subtitle: extractText(item["atom:subtitle"]),
     pubDate: item.pubDate ?? "",
     thumbnail: extractThumbnail(item),
   }));
@@ -93,6 +95,7 @@ interface RawNews {
   title: string;
   link: string;
   description: string;
+  subtitle: string;
   pubDate: string;
   thumbnail?: string;
 }
@@ -132,6 +135,7 @@ export async function fetchAllRss(): Promise<News[]> {
         allNews.push({
           id: `rss-${source.nome}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           titulo: item.title,
+          subtitulo: item.subtitle || undefined,
           resumo_original: item.description || item.title,
           url: item.link,
           thumbnail: item.thumbnail,

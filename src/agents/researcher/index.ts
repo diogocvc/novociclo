@@ -73,6 +73,7 @@ const EXCLUDED_KEYWORDS = [
   "futsal",
   "futebol de areia",
   "futebol feminino",
+  "fisiculturismo",
   "liga das nações",
   "série a", "série b", "série c", "série d",
   "serie a", "serie b", "serie c", "serie d",
@@ -89,6 +90,8 @@ const EXCLUDED_KEYWORDS = [
 
 const EXCLUDED_URL_PATTERNS = [
   "/volei/", "/basquete/", "/handebol/", "/tenis/",
+  "/fisiculturismo/",
+  "/futebol/futebol-internacional/",
 ];
 
 const OTHER_NATIONALITIES = [
@@ -202,7 +205,7 @@ export class ResearcherAgent extends BaseAgent {
       threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
 
       const relevantRss = allRss.filter((n) => {
-        if (!isRelevant(n.titulo, n.resumo_original, n.url)) return false;
+        if (!isRelevant(n.titulo, n.subtitulo || n.resumo_original, n.url)) return false;
         const pubDate = new Date(n.data_publicacao);
         if (isNaN(pubDate.getTime())) return true;
         return pubDate >= threeDaysBefore && pubDate <= targetEnd;
@@ -223,7 +226,7 @@ export class ResearcherAgent extends BaseAgent {
         data: input.date.toISOString().split("T")[0],
       });
 
-      const validLlmNews = result.news.filter((n) => isRelevant(n.titulo, n.resumo_original, n.url));
+      const validLlmNews = result.news.filter((n) => isRelevant(n.titulo, n.subtitulo || n.resumo_original, n.url));
       if (validLlmNews.length < result.news.length) {
         this.log(`LLM gerou ${result.news.length} notícias, ${result.news.length - validLlmNews.length} fora do escopo`);
       }
