@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { isRelevant } from "@/agents/researcher";
+import { isRelevant, isBlocked } from "@/agents/researcher";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -53,18 +53,26 @@ function cleanupChapter(filePath: string): boolean {
   const fm = parsed.data as unknown as ChapterFrontmatter;
 
   const refs = fm.noticias_referencia ?? [];
-  const validRefs = refs.filter((n) =>
-    isRelevant(n.titulo, n.resumo_original, n.url),
+  const validRefs = refs.filter(
+    (n) =>
+      isRelevant(n.titulo, n.resumo_original, n.url) &&
+      !isBlocked(n.titulo, n.resumo_original, n.url),
   );
 
   let changed = false;
 
   if (fm.noticia_destaque) {
-    const destaqueRelevante = isRelevant(
-      fm.noticia_destaque.titulo,
-      fm.noticia_destaque.resumo_original,
-      fm.noticia_destaque.url,
-    );
+    const destaqueRelevante =
+      isRelevant(
+        fm.noticia_destaque.titulo,
+        fm.noticia_destaque.resumo_original,
+        fm.noticia_destaque.url,
+      ) &&
+      !isBlocked(
+        fm.noticia_destaque.titulo,
+        fm.noticia_destaque.resumo_original,
+        fm.noticia_destaque.url,
+      );
 
     if (!destaqueRelevante) {
       changed = true;

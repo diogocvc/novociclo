@@ -177,7 +177,7 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   return score >= 3 || matchedGroups >= 2;
 }
 
-function isBlocked(title: string, resumo?: string, url?: string): boolean {
+export function isBlocked(title: string, resumo?: string, url?: string): boolean {
   const safeResumo = (resumo ?? "").toLowerCase();
   const safeUrl = (url ?? "").toLowerCase();
   const text = `${title.toLowerCase()} ${safeResumo}`;
