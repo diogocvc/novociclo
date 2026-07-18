@@ -95,7 +95,7 @@ interface RawNews {
   title: string;
   link: string;
   description: string;
-  subtitle: string;
+  subtitle?: string;
   pubDate: string;
   thumbnail?: string;
 }
