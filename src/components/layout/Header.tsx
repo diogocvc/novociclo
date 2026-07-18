@@ -30,7 +30,11 @@ export default function Header() {
   return (
     <>
       <header className="w-full h-[88px] flex items-center justify-between px-6 lg:px-8 bg-white border-b border-gray-light">
-        <Link href="/" className="text-xl font-bold uppercase tracking-tight leading-none">
+        <Link
+          href="/"
+          className="font-headline-logo text-[1.5rem] font-normal leading-none tracking-[0.15rem] uppercase text-[#6E8746]"
+          style={{ WebkitTextStroke: "1px #BFD09C" }}
+        >
           NOVO<br />CICLO
         </Link>
 
