@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { News } from "@/types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -16,34 +17,12 @@ interface RawFrontmatter {
   referencias: string[];
   noticia_destaque_id?: string;
   noticias_referencia_ids?: string[];
-  noticia_destaque?: {
-    id: string;
-    titulo: string;
-    resumo_original: string;
-    url: string;
-    thumbnail?: string;
-    fonte: string;
-    autor?: string;
-    data_publicacao: string;
-    idioma: string;
-    data_coleta: string;
-  };
-  noticias_referencia?: Array<{
-    id: string;
-    titulo: string;
-    resumo_original: string;
-    url: string;
-    thumbnail?: string;
-    fonte: string;
-    autor?: string;
-    data_publicacao: string;
-    idioma: string;
-    data_coleta: string;
-  }>;
+  noticia_destaque?: News;
+  noticias_referencia?: News[];
   tempo_de_leitura: number;
 }
 
-function collectMdxFiles(dir: string): string[] {
+export function collectMdxFiles(dir: string): string[] {
   const files: string[] = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 

@@ -1,19 +1,8 @@
 import fs from "fs";
 import path from "path";
 import * as yaml from "js-yaml";
+import type { News } from "@/types";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
-
-interface NewsItem {
-  id: string;
-  titulo: string;
-  url: string;
-  thumbnail?: string;
-  fonte: string;
-  data_publicacao: string;
-  resumo_original?: string;
-  idioma?: string;
-  data_coleta?: string;
-}
 
 function buildFrontmatter(fields: Record<string, unknown>): string {
   const clean: Record<string, unknown> = {};
@@ -41,7 +30,7 @@ export class PublisherAgent extends BaseAgent {
         corpo: string;
       };
 
-      const allNews = input.news as NewsItem[] | undefined;
+      const allNews = input.news as News[] | undefined;
 
       const date = input.date as Date;
       const year = date.getFullYear();

@@ -1,22 +1,11 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { News } from "@/types";
 import { isRelevant, isBlocked } from "@/agents/researcher";
+import { collectMdxFiles } from "@/lib/content";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
-
-interface NewsItem {
-  id: string;
-  titulo: string;
-  resumo_original: string;
-  url: string;
-  thumbnail?: string;
-  fonte: string;
-  autor?: string;
-  data_publicacao: string;
-  idioma: string;
-  data_coleta: string;
-}
 
 interface ChapterFrontmatter {
   id: string;
@@ -29,22 +18,8 @@ interface ChapterFrontmatter {
   tags: string[];
   referencias: string[];
   tempo_de_leitura: number;
-  noticia_destaque?: NewsItem;
-  noticias_referencia?: NewsItem[];
-}
-
-function collectMdxFiles(dir: string): string[] {
-  const files: string[] = [];
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...collectMdxFiles(fullPath));
-    } else if (entry.name.endsWith(".mdx")) {
-      files.push(fullPath);
-    }
-  }
-  return files;
+  noticia_destaque?: News;
+  noticias_referencia?: News[];
 }
 
 function cleanupChapter(filePath: string): boolean {

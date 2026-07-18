@@ -2,30 +2,19 @@ import fs from "fs";
 import path from "path";
 import * as yaml from "js-yaml";
 import matter from "gray-matter";
+import type { News } from "@/types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const YEAR = "2026";
 const MONTH = "07";
-
-interface NewsItem {
-  id: string;
-  titulo: string;
-  resumo_original: string;
-  url: string;
-  thumbnail?: string;
-  fonte: string;
-  data_publicacao: string;
-  idioma: string;
-  data_coleta: string;
-}
 
 interface ChapterData {
   titulo: string;
   subtitulo: string;
   resumo: string;
   corpo: string;
-  destaque: NewsItem;
-  referencias: NewsItem[];
+  destaque: News;
+  referencias: News[];
 }
 
 const articles: Record<string, ChapterData> = {

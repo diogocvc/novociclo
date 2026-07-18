@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import CountdownBanner from "@/components/layout/CountdownBanner";
+import PageLayout from "@/components/layout/PageLayout";
 
 export const metadata: Metadata = {
   title: "Sobre — Novo Ciclo",
@@ -11,10 +9,7 @@ export const metadata: Metadata = {
 
 export default function SobrePage() {
   return (
-    <>
-      <Header />
-      <CountdownBanner />
-      <main className="flex-1 w-full max-w-[820px] mx-auto px-6 lg:px-8 mt-16 mb-24">
+    <PageLayout>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-headline leading-[1.1] tracking-tight text-text">
           Sobre o Novo Ciclo
         </h1>
@@ -50,11 +45,9 @@ export default function SobrePage() {
             no repositório do projeto.
           </p>
           <blockquote className="mt-4 p-4 bg-white rounded-md border-l-4 border-green-primary italic text-text/70">
-            Atualizado todo dia às 18h
+            Atualizado todo dia às 18h, para você jantar se atualizando sobre a
+            seleção canarinho.
           </blockquote>
-          <p className="text-lg leading-relaxed text-text/80 mt-4">
-            para você jantar se atualizando sobre a seleção canarinho.
-          </p>
         </section>
 
         <section className="mt-12">
@@ -112,8 +105,6 @@ export default function SobrePage() {
             infraestrutura roda na Vercel, com deploy automatizado via GitHub.
           </p>
         </section>
-      </main>
-      <Footer />
-    </>
+    </PageLayout>
   );
 }

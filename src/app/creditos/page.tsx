@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import CountdownBanner from "@/components/layout/CountdownBanner";
+import PageLayout from "@/components/layout/PageLayout";
 
 export const metadata: Metadata = {
   title: "Créditos — Novo Ciclo",
@@ -11,10 +9,7 @@ export const metadata: Metadata = {
 
 export default function CreditosPage() {
   return (
-    <>
-      <Header />
-      <CountdownBanner />
-      <main className="flex-1 w-full max-w-[820px] mx-auto px-6 lg:px-8 mt-16 mb-24">
+    <PageLayout>
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold font-headline leading-[1.1] tracking-tight text-text">
           Créditos
         </h1>
@@ -110,8 +105,6 @@ export default function CreditosPage() {
             ))}
           </ul>
         </section>
-      </main>
-      <Footer />
-    </>
+    </PageLayout>
   );
 }

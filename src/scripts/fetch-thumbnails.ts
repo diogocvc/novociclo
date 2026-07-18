@@ -1,23 +1,11 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import type { News } from "@/types";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const GENERIC_GE_THUMB =
   "https://s2-ge.glbimg.com/ecRQoCSBk34mh9TLZBn-J1Sxpmw=/i.s3.glbimg.com/v1/AUTH_bc8228b6673f488aa253bbcb03c80ec5/internal_photos/bs/2026/S/p/3Uj3kXREK9fkABSm0L8g/afp-20260705-b9bv84r-v1-highres-fblwc2026match91branor.jpg";
-
-interface NewsItem {
-  id: string;
-  titulo: string;
-  resumo_original: string;
-  url: string;
-  thumbnail?: string;
-  fonte: string;
-  autor?: string;
-  data_publicacao: string;
-  idioma: string;
-  data_coleta: string;
-}
 
 async function extractImageFromUrl(url: string): Promise<string | null> {
   try {
@@ -60,7 +48,7 @@ async function extractImageFromUrl(url: string): Promise<string | null> {
   }
 }
 
-function needsThumbnail(item: NewsItem): boolean {
+function needsThumbnail(item: News): boolean {
   return !item.thumbnail || item.thumbnail === GENERIC_GE_THUMB || item.thumbnail === "";
 }
 
@@ -71,7 +59,7 @@ async function processFile(filePath: string): Promise<boolean> {
 
   let changed = false;
 
-  const destaque = fm.noticia_destaque as NewsItem | undefined;
+  const destaque = fm.noticia_destaque as News | undefined;
   if (destaque && needsThumbnail(destaque)) {
     const img = await extractImageFromUrl(destaque.url);
     if (img) {
@@ -81,7 +69,7 @@ async function processFile(filePath: string): Promise<boolean> {
     }
   }
 
-  const refs = fm.noticias_referencia as NewsItem[] | undefined;
+  const refs = fm.noticias_referencia as News[] | undefined;
   if (refs) {
     for (let i = 0; i < refs.length; i++) {
       if (needsThumbnail(refs[i])) {
