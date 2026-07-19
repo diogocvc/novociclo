@@ -55,14 +55,14 @@ O pipeline diário executa uma vez por dia e produz um novo capítulo do Novo Ci
 
 ## Trigger
 
-- Horário: 08:00 BRT (configurável).
+- Horário: 18:00 BRT (21:00 UTC) (configurável).
 - Mecanismo: Cron no GitHub Actions.
 - Fallback: Permitir execução manual via workflow_dispatch.
 
 ## Fluxo
 
 ```text
-[Trigger: Cron 08:00 BRT]
+[Trigger: Cron 18:00 BRT (21:00 UTC)]
         │
         ▼
 [1. Setup: Checkout + Dependências]
@@ -127,84 +127,39 @@ O pipeline diário executa uma vez por dia e produz um novo capítulo do Novo Ci
 
 ```yaml
 name: Daily Pipeline
-
 on:
   schedule:
-    - cron: '0 11 * * *' # 08:00 BRT (11:00 UTC)
+    - cron: "0 21 * * *" # 18:00 BRT (21:00 UTC)
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  daily-pipeline:
+  daily:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 24
+          cache: npm
       - run: npm ci
-      - run: npm run pipeline:daily
+      - run: npm run pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      - run: npm run build
-      - name: Commit and push
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo.vercel.app' }}
+          NEXT_PUBLIC_CYCLE_START_DATE: ${{ vars.NEXT_PUBLIC_CYCLE_START_DATE || '2026-07-05T00:00:00-03:00' }}
+          NEXT_PUBLIC_WORLD_CUP_DATE: ${{ vars.NEXT_PUBLIC_WORLD_CUP_DATE || '2030-06-11T00:00:00-03:00' }}
+          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID || 'G-T9J81CXJ2E' }}
+      - if: success()
         run: |
           git config user.name "Novo Ciclo Bot"
-          git config user.email "bot@novociclo.com"
-          git add .
-          git diff --staged --quiet || git commit -m "daily: capítulo $(date +%Y-%m-%d)"
+          git config user.email "bot@novociclo.app"
+          git add content/ public/rss.xml
+          git commit -m "chore: daily pipeline $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git pull --rebase
           git push
-```
-
-## deploy.yml
-
-```yaml
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-```
-
-## test.yml
-
-```yaml
-name: Tests
-
-on:
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
 ```
 
 ---

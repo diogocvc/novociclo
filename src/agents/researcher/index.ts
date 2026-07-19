@@ -86,12 +86,18 @@ const EXCLUDED_KEYWORDS = [
   "seleção da frança", "seleção da espanha", "seleção da argentina",
   "presidente da frança", "presidente da espanha",
   "botafogo", "ferroviário",
+  "copa paulista", "copa do nordeste",
+  "campeonato estadual", "estadual",
+  "série a2", "serie a2", "série a3", "serie a3",
 ];
 
 const EXCLUDED_URL_PATTERNS = [
   "/volei/", "/basquete/", "/handebol/", "/tenis/",
   "/fisiculturismo/",
   "/futebol/futebol-internacional/",
+  "/sp/", "/rj/", "/ce/", "/rs/", "/mg/", "/ba/",
+  "/pr/", "/pe/", "/sc/", "/df/", "/es/", "/go/",
+  "/futebol/times/",
 ];
 
 const OTHER_NATIONALITIES = [
@@ -174,7 +180,7 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   if (hasExcludedContent(text, safeResumo, safeUrl)) return false;
 
   const { score, matchedGroups } = calculateScore(title, safeResumo);
-  return score >= 3 || matchedGroups >= 2;
+  return score >= 3;
 }
 
 export function isBlocked(title: string, resumo?: string, url?: string): boolean {
