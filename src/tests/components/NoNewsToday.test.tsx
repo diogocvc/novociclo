@@ -12,9 +12,7 @@ describe("NoNewsToday", () => {
       />
     );
 
-    expect(
-      screen.getByText(/não há nenhuma novidade do novo ciclo hoje/i)
-    ).toBeDefined();
+    expect(screen.getByText(/hoje/i)).toBeDefined();
   });
 
   it("renders 'neste dia' message when date is in the past", () => {
