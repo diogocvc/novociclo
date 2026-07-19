@@ -16,7 +16,7 @@ export default function NoNewsToday({ date, latestDate, latestSlug }: Props) {
       <div className="max-w-[820px]">
         <h1 className="text-[2.4rem] sm:text-[3rem] lg:text-[3.6rem] xl:text-[4.8rem] font-bold font-headline leading-[1.0] tracking-tight text-text/70">
           <span>Até agora não temos novidades para hoje. </span>
-          <span className="block text-[80%]">Nosso site é atualizado diariamente, às 18h. Até lá, você pode acessar as notícias mais recentes:</span>
+          <span className="block text-[80%] mt-4">Nosso site é atualizado diariamente, às 18h. Até lá, você pode acessar as notícias mais recentes:</span>
         </h1>
         <a
           href={`/${latestSlug}`}
