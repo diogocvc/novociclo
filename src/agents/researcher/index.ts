@@ -89,6 +89,9 @@ const EXCLUDED_KEYWORDS = [
   "copa paulista", "copa do nordeste",
   "campeonato estadual", "estadual",
   "série a2", "serie a2", "série a3", "serie a3",
+  "gramado natural", "grama natural",
+  "transfer ban",
+  "nfl",
 ];
 
 const EXCLUDED_URL_PATTERNS = [
@@ -98,6 +101,17 @@ const EXCLUDED_URL_PATTERNS = [
   "/sp/", "/rj/", "/ce/", "/rs/", "/mg/", "/ba/",
   "/pr/", "/pe/", "/sc/", "/df/", "/es/", "/go/",
   "/futebol/times/",
+  "/flamengo/", "/corinthians/", "/palmeiras/",
+  "/sao-paulo/", "/santos/", "/gremio/", "/internacional/",
+];
+
+const CLUBES_BRASILEIROS = [
+  "flamengo", "corinthians", "palmeiras", "são paulo", "saopaulo",
+  "santos", "grêmio", "gremio", "internacional", "atlético-mg",
+  "atletico-mg", "atlético paranaense", "cruzeiro", "botafogo",
+  "fluminense", "vasco", "bahia", "fortaleza", "ceará", "ceara",
+  "goiás", "goias", "coritiba", "chapecoense", "sport", "nautico",
+  "vitória", "vitoria", "juventude", "cuiabá", "criciúma",
 ];
 
 const OTHER_NATIONALITIES = [
@@ -135,6 +149,19 @@ Regras:
 - NÃO inclua opinião pessoal
 - Responda APENAS com um objeto JSON no formato: { "news": [...] }`;
 
+function hasDisguisedClubOrOffTopicNews(title: string, resumo: string, url: string): boolean {
+  const text = `${title} ${resumo}`.toLowerCase();
+  const temClube = CLUBES_BRASILEIROS.some((c) => text.includes(c));
+  const temSelecaoOuCbf = text.includes("seleção") || text.includes("selecao") || text.includes("cbf");
+  const temFifa = text.includes("fifa");
+  const temCopa = text.includes("copa do mundo");
+
+  if (temClube && temFifa && !temSelecaoOuCbf) return true;
+  if (temClube && temCopa && !temSelecaoOuCbf) return true;
+
+  return false;
+}
+
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
   const text = `${title} ${resumo}`;
   const urlLower = url.toLowerCase();
@@ -152,6 +179,7 @@ function hasExcludedContent(title: string, resumo: string, url: string): boolean
     text.includes("brasileiros");
 
   if (hasNationality && hasSelecao && !hasBrasil) return true;
+  if (hasDisguisedClubOrOffTopicNews(title, resumo, url)) return true;
 
   return false;
 }

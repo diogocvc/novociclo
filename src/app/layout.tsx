@@ -41,6 +41,9 @@ export default function RootLayout({
       lang="pt-BR"
       className={`${inter.variable} ${interTight.variable} ${bungeeShade.variable}`}
     >
+      <head>
+        <meta charSet="UTF-8" />
+      </head>
       <body className="min-h-full flex flex-col antialiased">
         {children}
         {process.env.NEXT_PUBLIC_GA_ID && (
