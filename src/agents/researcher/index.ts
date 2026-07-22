@@ -1,5 +1,4 @@
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
-import type { News } from "@/types";
 import { fetchAllRss } from "@/lib/rss";
 import rawBlocklist from "@/config/news-blocklist.json";
 
@@ -126,29 +125,6 @@ const OTHER_NATIONALITIES = [
   "bélgica", "belga",
 ];
 
-const PROMPT = `Você é o Pesquisador do Novo Ciclo (modo fallback).
-
-ATENÇÃO: Você está sendo acionado porque a coleta via RSS retornou poucas notícias relevantes. Sua missão é complementar com notícias factuais e realistas.
-
-Escopo permitido (APENAS estes temas):
-- Seleção Brasileira de Futebol (jogadores, convocações, técnico, jogos, preparação)
-- CBF (decisões, eleições, planejamento que impactam a Seleção)
-- FIFA (regras, decisões que impactam a Copa do Mundo)
-- Copa do Mundo 2030 (preparação dos países sede, eliminatórias, Copa América 2028)
-
-Regras:
-- Gera de 3 a 8 notícias factuais e realistas
-- NÃO inclua notícias sobre outras seleções (França, Espanha, Argentina como adversárias)
-- NÃO inclua notícias de outras modalidades (vôlei, basquete, handebol, tênis, etc.)
-- NÃO inclua notícias de divisões inferiores (Série B, C, D) ou estaduais
-- Cada notícia deve ter: id, titulo, resumo_original, url, fonte, data_publicacao, idioma, data_coleta
-- Fontes possíveis: ge.globo.com, uol.com.br, espn.com.br, cbf.com.br
-- URLs devem seguir o padrão real dos domínios
-- Data de publicação deve ser próxima à data fornecida
-- NÃO invente jogadores ou eventos que não existem
-- NÃO inclua opinião pessoal
-- Responda APENAS com um objeto JSON no formato: { "news": [...] }`;
-
 function hasDisguisedClubOrOffTopicNews(title: string, resumo: string, url: string): boolean {
   const text = `${title} ${resumo}`.toLowerCase();
   const temClube = CLUBES_BRASILEIROS.some((c) => text.includes(c));
@@ -249,27 +225,12 @@ export class ResearcherAgent extends BaseAgent {
 
       if (topRss.length >= 3) {
         this.log(`RSS: ${allRss.length} total, ${relevantRss.length} relevantes, ${relevantRss.length - cleanRss.length} bloqueadas, ${topRss.length} selecionadas`);
-        return {
-          success: true,
-          data: { news: topRss, source: "rss" },
-        };
+      } else {
+        this.log(`Apenas ${topRss.length} notícias relevantes no RSS. Publicando sem complemento (sem LLM).`);
       }
-
-      this.log(`Apenas ${topRss.length} notícias relevantes no RSS. Gerando complemento via LLM...`);
-      const result = await this.callLLM<{ news: News[] }>(PROMPT, {
-        data: input.date.toISOString().split("T")[0],
-      });
-
-      const validLlmNews = result.news.filter((n) => isRelevant(n.titulo, n.subtitulo || n.resumo_original, n.url));
-      if (validLlmNews.length < result.news.length) {
-        this.log(`LLM gerou ${result.news.length} notícias, ${result.news.length - validLlmNews.length} fora do escopo`);
-      }
-
-      const combined = [...topRss, ...validLlmNews].slice(0, 8);
-      this.log(`Coleta concluída: ${combined.length} notícias (${topRss.length} RSS + ${validLlmNews.length} LLM)`);
       return {
         success: true,
-        data: { news: combined, source: "mixed" },
+        data: { news: topRss, source: "rss" },
       };
     } catch (error) {
       const message =
