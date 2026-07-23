@@ -44,8 +44,8 @@ export default function SobrePage() {
             O conteúdo é gerado e armazenado como arquivos de texto versionados
             no repositório do projeto.
           </p>
-          <blockquote className="mt-4 p-4 bg-white rounded-md border-l-4 border-green-primary italic text-text/70">
-            Atualizado todo dia às 18h, para você jantar se atualizando sobre a
+          <blockquote className="mt-4 p-4 bg-white rounded-md border-l-4 border-green-primary font-bold italic text-text/70">
+            Atualizado todo dia às 19h, para você jantar se atualizando sobre a
             seleção canarinho.
           </blockquote>
         </section>

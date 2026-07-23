@@ -54,6 +54,17 @@ describe("NoNewsToday", () => {
     expect(links[0].getAttribute("href")).toBe("https://ge.globo.com/noticia1");
   });
 
+  it("shows publication date for each news item", () => {
+    render(
+      <NoNewsToday
+        date={new Date("2026-07-14")}
+        latestNews={mockNews}
+      />
+    );
+
+    expect(screen.getByText(/notícia publicada em/i)).toBeDefined();
+  });
+
   it("shows the title of the latest news", () => {
     render(
       <NoNewsToday
