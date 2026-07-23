@@ -9,7 +9,7 @@ import NoNewsToday from "@/components/home/NoNewsToday";
 import {
   getChapterBySlug,
   getAllPublishedChapters,
-  getLatestChapterWithNews,
+  getLatestNewsItems,
 } from "@/data/mock-chapters";
 
 interface Props {
@@ -32,7 +32,7 @@ export default async function ChapterPage({ params }: Props) {
   }
 
   const hasNews = chapter.noticia_destaque || chapter.noticias_referencia.length > 0;
-  const latestWithNews = getLatestChapterWithNews();
+  const latestNews = getLatestNewsItems(3);
 
   return (
     <>
@@ -42,11 +42,10 @@ export default async function ChapterPage({ params }: Props) {
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
         {hasNews ? (
           <ChapterContent chapter={chapter} />
-        ) : latestWithNews ? (
+        ) : latestNews.length > 0 ? (
           <NoNewsToday
             date={new Date(chapter.data)}
-            latestDate={new Date(latestWithNews.data)}
-            latestSlug={latestWithNews.slug}
+            latestNews={latestNews}
           />
         ) : (
           <ChapterContent chapter={chapter} />

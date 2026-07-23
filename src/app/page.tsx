@@ -5,7 +5,7 @@ import WeeklyNavigation from "@/components/home/WeeklyNavigation";
 import WeekArchive from "@/components/home/WeekArchive";
 import ChapterContent from "@/components/chapter/ChapterContent";
 import NoNewsToday from "@/components/home/NoNewsToday";
-import { getLatestChapter, getAllPublishedChapters } from "@/data/mock-chapters";
+import { getLatestChapter, getAllPublishedChapters, getLatestNewsItems } from "@/data/mock-chapters";
 
 export default function Home() {
   const chapters = getAllPublishedChapters();
@@ -35,8 +35,7 @@ export default function Home() {
         {!hasNewsToday && chapters.length > 0 ? (
           <NoNewsToday
             date={today}
-            latestDate={new Date(chapters[0].data)}
-            latestSlug={chapters[0].slug}
+            latestNews={getLatestNewsItems(3)}
           />
         ) : chapter ? (
           <ChapterContent chapter={chapter} />

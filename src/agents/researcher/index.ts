@@ -221,16 +221,10 @@ export class ResearcherAgent extends BaseAgent {
         return pubDate >= threeDaysBefore && pubDate <= targetEnd;
       });
       const cleanRss = relevantRss.filter((n) => !isBlocked(n.titulo, n.resumo_original, n.url));
-      const topRss = cleanRss.slice(0, 8);
-
-      if (topRss.length >= 3) {
-        this.log(`RSS: ${allRss.length} total, ${relevantRss.length} relevantes, ${relevantRss.length - cleanRss.length} bloqueadas, ${topRss.length} selecionadas`);
-      } else {
-        this.log(`Apenas ${topRss.length} notícias relevantes no RSS. Publicando sem complemento (sem LLM).`);
-      }
+      this.log(`RSS: ${allRss.length} total, ${relevantRss.length} relevantes, ${relevantRss.length - cleanRss.length} bloqueadas, ${cleanRss.length} selecionadas`);
       return {
         success: true,
-        data: { news: topRss, source: "rss" },
+        data: { news: cleanRss, source: "rss" },
       };
     } catch (error) {
       const message =

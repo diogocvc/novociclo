@@ -1,4 +1,4 @@
-import type { Chapter } from "@/types";
+import type { Chapter, News } from "@/types";
 import { getAllChapters, getChapterNarrative } from "@/lib/content";
 import { mockNews } from "./mock-news";
 
@@ -52,4 +52,27 @@ export function getLatestChapterWithNews(): Chapter | undefined {
   return chapters.find(
     (c) => c.noticia_destaque || c.noticias_referencia.length > 0
   );
+}
+
+export function getLatestNewsItems(count: number): News[] {
+  const chapters = getAllPublishedChapters();
+  const seen = new Set<string>();
+
+  const allNews: { news: News; pubDate: Date }[] = [];
+  for (const chapter of chapters) {
+    if (chapter.noticia_destaque && !seen.has(chapter.noticia_destaque.id)) {
+      seen.add(chapter.noticia_destaque.id);
+      allNews.push({ news: chapter.noticia_destaque, pubDate: new Date(chapter.noticia_destaque.data_publicacao) });
+    }
+    for (const ref of chapter.noticias_referencia) {
+      if (!seen.has(ref.id)) {
+        seen.add(ref.id);
+        allNews.push({ news: ref, pubDate: new Date(ref.data_publicacao) });
+      }
+    }
+  }
+
+  allNews.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+
+  return allNews.slice(0, count).map((item) => item.news);
 }

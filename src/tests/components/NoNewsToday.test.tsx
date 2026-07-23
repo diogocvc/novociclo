@@ -1,14 +1,27 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import NoNewsToday from "@/components/home/NoNewsToday";
+import type { News } from "@/types";
+
+const mockNews: News[] = [
+  {
+    id: "n1",
+    titulo: "Seleção Brasileira se prepara para amistoso",
+    resumo_original: "A Seleção Brasileira iniciou a preparação...",
+    url: "https://ge.globo.com/noticia1",
+    fonte: "ge",
+    data_publicacao: "2026-07-22T18:00:00.000Z",
+    idioma: "pt-BR",
+    data_coleta: "2026-07-22T22:00:00.000Z",
+  },
+];
 
 describe("NoNewsToday", () => {
   it("renders 'hoje' message when date is today", () => {
     render(
       <NoNewsToday
         date={new Date()}
-        latestDate={new Date("2026-07-13")}
-        latestSlug="2026/07/13"
+        latestNews={mockNews}
       />
     );
 
@@ -19,8 +32,7 @@ describe("NoNewsToday", () => {
     render(
       <NoNewsToday
         date={new Date("2026-07-14")}
-        latestDate={new Date("2026-07-13")}
-        latestSlug="2026/07/13"
+        latestNews={mockNews}
       />
     );
 
@@ -29,26 +41,27 @@ describe("NoNewsToday", () => {
     ).toBeDefined();
   });
 
-  it("renders a link to the latest chapter", () => {
+  it("renders news cards when latestNews is provided", () => {
     render(
       <NoNewsToday
-        latestDate={new Date("2026-07-13")}
-        latestSlug="2026/07/13"
+        date={new Date("2026-07-14")}
+        latestNews={mockNews}
       />
     );
 
-    const link = screen.getByRole("link");
-    expect(link.getAttribute("href")).toBe("/2026/07/13");
+    const links = screen.getAllByRole("link");
+    expect(links.length).toBeGreaterThan(0);
+    expect(links[0].getAttribute("href")).toBe("https://ge.globo.com/noticia1");
   });
 
-  it("displays the date on the button", () => {
+  it("shows the title of the latest news", () => {
     render(
       <NoNewsToday
-        latestDate={new Date("2026-07-13")}
-        latestSlug="2026/07/13"
+        date={new Date("2026-07-14")}
+        latestNews={mockNews}
       />
     );
 
-    expect(screen.getByText("13/07/2026")).toBeDefined();
+    expect(screen.getByText("Seleção Brasileira se prepara para amistoso")).toBeDefined();
   });
 });
