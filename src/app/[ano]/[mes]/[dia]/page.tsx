@@ -55,6 +55,7 @@ export default async function ChapterPage({ params }: Props) {
       <WeeklyNavigation
         currentDate={new Date(chapter.data)}
         publishedSlugs={publishedSlugs}
+        slugsWithNews={chapters.filter((c) => c.noticia_destaque || c.noticias_referencia.length > 0).map((c) => c.slug)}
       />
       <WeekArchive chapters={chapters} />
       <Footer />

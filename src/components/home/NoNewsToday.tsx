@@ -9,7 +9,9 @@ interface Props {
 
 export default function NoNewsToday({ date, latestNews }: Props) {
   const isToday = date && isSameDay(date, new Date());
-  const beforeUpdate = isToday && new Date().getHours() < 18;
+  const nowBRT = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+  const hourBRT = new Date(nowBRT).getHours();
+  const beforeUpdate = isToday && hourBRT < 18;
 
   let message: string;
   if (beforeUpdate) {

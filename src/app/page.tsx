@@ -44,7 +44,10 @@ export default function Home() {
         )}
       </main>
 
-      <WeeklyNavigation publishedSlugs={publishedSlugs} />
+      <WeeklyNavigation
+        publishedSlugs={publishedSlugs}
+        slugsWithNews={chapters.filter((c) => c.noticia_destaque || c.noticias_referencia.length > 0).map((c) => c.slug)}
+      />
       <WeekArchive chapters={chapters} />
       <Footer />
     </>

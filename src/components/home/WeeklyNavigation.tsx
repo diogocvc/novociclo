@@ -5,16 +5,18 @@ import { startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
 
-type DayState = "disabled" | "today" | "active" | "empty";
+type DayState = "disabled" | "today" | "active" | "no-news" | "empty";
 
 interface Props {
   currentDate?: Date;
   publishedSlugs?: string[];
+  slugsWithNews?: string[];
 }
 
 export default function WeeklyNavigation({
   currentDate,
   publishedSlugs = [],
+  slugsWithNews = [],
 }: Props) {
   const weekDays = useMemo(() => {
     const reference = currentDate ?? new Date();
@@ -26,7 +28,8 @@ export default function WeeklyNavigation({
       const m = String(date.getMonth() + 1).padStart(2, "0");
       const d = String(date.getDate()).padStart(2, "0");
       const slug = `${y}/${m}/${d}`;
-      const hasNews = publishedSlugs.includes(slug);
+      const hasPublish = publishedSlugs.includes(slug);
+      const hasNews = slugsWithNews.includes(slug);
 
       let state: DayState;
       if (date.toDateString() === today.toDateString()) {
@@ -35,6 +38,8 @@ export default function WeeklyNavigation({
         state = "disabled";
       } else if (hasNews) {
         state = "active";
+      } else if (hasPublish) {
+        state = "no-news";
       } else {
         state = "empty";
       }
@@ -47,7 +52,7 @@ export default function WeeklyNavigation({
         slug: state === "active" ? `/${slug}` : undefined,
       };
     });
-  }, [currentDate, publishedSlugs]);
+  }, [currentDate, publishedSlugs, slugsWithNews]);
 
   if (weekDays.length === 0) return null;
 
@@ -91,6 +96,9 @@ export default function WeeklyNavigation({
               <span className="text-xs flex items-center gap-1 mt-1 uppercase tracking-wider">
                 ler <ChevronRight size={12} />
               </span>
+            )}
+            {day.state === "no-news" && (
+              <span className="text-xs text-gray-medium mt-1">Sem novidades</span>
             )}
             {day.state === "empty" && (
               <span className="text-xs text-gray-medium mt-1">—</span>
