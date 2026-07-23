@@ -54,19 +54,16 @@ describe("ResearcherAgent", () => {
     expect(mockCallLLM).not.toHaveBeenCalled();
   });
 
-  it("falls back to LLM when RSS has few relevant items", async () => {
+  it("returns what RSS gives when few relevant items (no LLM fallback)", async () => {
     mockFetchAllRss.mockResolvedValueOnce([
       makeNews("n1", "Notícia genérica sem relação"),
     ]);
 
-    mockCallLLM.mockResolvedValueOnce({
-      content: { news: [makeNews("n4", "Brasil se prepara para a Copa do Mundo 2030")] },
-      tokens: { prompt: 10, completion: 20, total: 30 },
-    });
-
     const result = await agent.execute({ date: new Date("2026-07-15") });
     expect(result.success).toBe(true);
-    expect(mockCallLLM).toHaveBeenCalledTimes(1);
+    expect(mockCallLLM).not.toHaveBeenCalled();
+    const news = (result.data as { news: unknown[] }).news;
+    expect(news).toHaveLength(0);
   });
 
   it("excludes articles from other sports (volleyball, basketball, handball, tennis)", async () => {
@@ -182,35 +179,12 @@ describe("ResearcherAgent", () => {
     expect(titles).toContain("Seleção Brasileira vence amistoso");
   });
 
-  it("filters LLM output that is out of scope", async () => {
-    mockFetchAllRss.mockResolvedValueOnce([
-      makeNews("n1", "Notícia genérica"),
-    ]);
-
-    mockCallLLM.mockResolvedValueOnce({
-      content: {
-        news: [
-          makeNews("n2", "Seleção Brasileira renovada para 2030"),
-          makeNews("n3", "França elimina Espanha na semifinal da Copa"),
-        ],
-      },
-      tokens: { prompt: 10, completion: 20, total: 30 },
-    });
-
-    const result = await agent.execute({ date: new Date("2026-07-15") });
-    expect(result.success).toBe(true);
-    const news = (result.data as { news: { titulo: string }[] }).news;
-    const titles = news.map((n) => n.titulo);
-    expect(titles).toContain("Seleção Brasileira renovada para 2030");
-    expect(titles).not.toContain("França elimina Espanha na semifinal da Copa");
-  });
-
-  it("returns error when RSS and LLM both fail", async () => {
+  it("returns empty result when RSS has no items (no error)", async () => {
     mockFetchAllRss.mockResolvedValueOnce([]);
-    mockCallLLM.mockRejectedValueOnce(new Error("LLM error"));
 
     const result = await agent.execute({ date: new Date() });
-    expect(result.success).toBe(false);
-    expect(result.error).toBe("LLM error");
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: unknown[] }).news;
+    expect(news).toHaveLength(0);
   });
 });
