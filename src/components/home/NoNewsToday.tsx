@@ -1,6 +1,7 @@
 import { isSameDay, format } from "date-fns";
 import type { News } from "@/types";
 import NewsCard from "@/components/chapter/NewsCard";
+import { getTodayBRT, getHourBRT } from "@/lib/date";
 
 interface Props {
   date?: Date;
@@ -8,14 +9,13 @@ interface Props {
 }
 
 export default function NoNewsToday({ date, latestNews }: Props) {
-  const isToday = date && isSameDay(date, new Date());
-  const nowBRT = new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-  const hourBRT = new Date(nowBRT).getHours();
+  const isToday = date && isSameDay(date, getTodayBRT());
+  const hourBRT = getHourBRT();
   const beforeUpdate = isToday && hourBRT < 18;
 
   let message: string;
   if (beforeUpdate) {
-    message = "Até agora não temos novidades para hoje. Nosso site é atualizado diariamente, às 18h. Até lá, confira as notícias mais recentes:";
+    message = "Até agora não temos novidades para hoje. Nosso site é atualizado diariamente, às 18h. Mas por enquanto você pode conferir as últimas notícias:";
   } else if (isToday) {
     message = "Não há nenhuma novidade do Novo Ciclo hoje, mas você pode se atualizar com as últimas notícias:";
   } else {

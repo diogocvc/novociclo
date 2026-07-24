@@ -35,6 +35,21 @@ const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
   </channel>
 </rss>`;
 
+function mockRssResponse(xml: string) {
+  const encoder = new TextEncoder();
+  const buffer = encoder.encode(xml).buffer;
+  return {
+    ok: true,
+    arrayBuffer: () => Promise.resolve(buffer),
+    headers: {
+      get: (name: string) =>
+        name.toLowerCase() === "content-type"
+          ? "application/rss+xml; charset=utf-8"
+          : null,
+    },
+  };
+}
+
 describe("rss lib", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -45,10 +60,7 @@ describe("rss lib", () => {
   });
 
   it("fetches and parses RSS items", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      text: () => Promise.resolve(rssXml),
-    });
+    mockFetch.mockResolvedValueOnce(mockRssResponse(rssXml));
 
     const { fetchSourceRss } = await import("@/lib/rss");
     const items = await fetchSourceRss("https://globoesporte.globo.com/rss/ge/");
@@ -60,10 +72,7 @@ describe("rss lib", () => {
   });
 
   it("fetchAllRss returns News array", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      text: () => Promise.resolve(rssXml),
-    });
+    mockFetch.mockResolvedValueOnce(mockRssResponse(rssXml));
 
     const { fetchAllRss } = await import("@/lib/rss");
     const news = await fetchAllRss();

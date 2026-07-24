@@ -100,12 +100,36 @@ interface RawNews {
   thumbnail?: string;
 }
 
+function detectCharset(contentType: string, xmlHeader: string): string {
+  const fromHeader = contentType.match(/charset=([^;]+)/i);
+  if (fromHeader) return fromHeader[1].trim().replace(/["']/g, "");
+
+  const fromXml = xmlHeader.match(/encoding=["']([^"']+)["']/i);
+  if (fromXml) return fromXml[1].trim();
+
+  return "utf-8";
+}
+
 export async function fetchSourceRss(
   rssUrl: string
 ): Promise<RawNews[]> {
   try {
     const response = await fetch(rssUrl);
-    const text = await response.text();
+    const buffer = await response.arrayBuffer();
+    const contentType = response.headers.get("content-type") || "";
+
+    const rawBytes = new Uint8Array(buffer);
+    const peekLength = Math.min(512, rawBytes.length);
+    const peekDecoder = new TextDecoder("ascii", { fatal: false });
+    const peek = peekDecoder.decode(rawBytes.slice(0, peekLength));
+
+    const charset = detectCharset(contentType, peek);
+    const decoder = new TextDecoder(
+      charset === "iso-8859-1" ? "windows-1252" : charset,
+      { fatal: false }
+    );
+    const text = decoder.decode(rawBytes);
+
     const parsed = parser.parse(text) as RssFeed;
 
     if (parsed.rss?.channel) {

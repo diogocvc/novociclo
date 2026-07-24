@@ -6,12 +6,13 @@ import WeekArchive from "@/components/home/WeekArchive";
 import ChapterContent from "@/components/chapter/ChapterContent";
 import NoNewsToday from "@/components/home/NoNewsToday";
 import { getLatestChapter, getAllPublishedChapters, getLatestNewsItems } from "@/data/mock-chapters";
+import { getTodayBRT } from "@/lib/date";
 
 export default function Home() {
   const chapters = getAllPublishedChapters();
   const chapter = getLatestChapter();
   const publishedSlugs = chapters.map((c) => c.slug);
-  const today = new Date();
+  const today = getTodayBRT();
   const todaySlug = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}`;
   const hasNewsToday = publishedSlugs.includes(todaySlug);
 

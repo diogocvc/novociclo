@@ -1,6 +1,35 @@
 import { format, formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+const BRT_TIMEZONE = "America/Sao_Paulo";
+
+export function getTodayBRT(): Date {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: BRT_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+
+  const year = parts.find((p) => p.type === "year")?.value ?? "0";
+  const month = parts.find((p) => p.type === "month")?.value ?? "0";
+  const day = parts.find((p) => p.type === "day")?.value ?? "0";
+
+  return new Date(`${year}-${month}-${day}T00:00:00`);
+}
+
+export function getHourBRT(): number {
+  const now = new Date();
+  return Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: BRT_TIMEZONE,
+      hour: "numeric",
+      hour12: false,
+    }).format(now)
+  );
+}
+
 export function getDayNumber(startDate: Date, currentDate: Date): number {
   const diff = currentDate.getTime() - startDate.getTime();
   return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
