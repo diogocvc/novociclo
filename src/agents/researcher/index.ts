@@ -131,9 +131,15 @@ function hasDisguisedClubOrOffTopicNews(title: string, resumo: string, url: stri
   const temSelecaoOuCbf = text.includes("seleção") || text.includes("selecao") || text.includes("cbf");
   const temFifa = text.includes("fifa");
   const temCopa = text.includes("copa do mundo");
+  const temEliminatorias = text.includes("eliminatórias") || text.includes("eliminatorias");
+  const temContextoSelecao = temSelecaoOuCbf || temCopa || temEliminatorias;
 
-  if (temClube && temFifa && !temSelecaoOuCbf) return true;
-  if (temClube && temCopa && !temSelecaoOuCbf) return true;
+  if (temClube && temFifa && !temContextoSelecao) return true;
+  if (temClube && temCopa && !temContextoSelecao) return true;
+
+  const selecaoGroup = POSITIVE_GROUPS.find((g) => g.name === "SELEÇÃO");
+  const temJogadorSelecao = selecaoGroup?.keywords.some((kw) => text.includes(kw)) ?? false;
+  if (temClube && temJogadorSelecao && !temContextoSelecao) return true;
 
   return false;
 }
