@@ -11,11 +11,11 @@ interface Props {
 export default function NoNewsToday({ date, latestNews }: Props) {
   const isToday = date && isSameDay(date, getTodayBRT());
   const hourBRT = getHourBRT();
-  const beforeUpdate = isToday && hourBRT < 18;
+  const beforeUpdate = isToday && hourBRT < 19;
 
   let message: string;
   if (beforeUpdate) {
-    message = "Até agora não temos novidades para hoje. Nosso site é atualizado diariamente, às 18h. Mas por enquanto você pode conferir as últimas notícias:";
+    message = "Até agora não temos novidades para hoje. Nosso site é atualizado diariamente, às 19h. Mas por enquanto você pode conferir as últimas notícias:";
   } else if (isToday) {
     message = "Não há nenhuma novidade do Novo Ciclo hoje, mas você pode se atualizar com as últimas notícias:";
   } else {
