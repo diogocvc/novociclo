@@ -32,3 +32,75 @@ jobs:
           git commit -m "chore: daily pipeline $(date +%Y-%m-%d)" || echo "No changes to commit"
           git pull --rebase
           git push
+
+      - name: Wait for Vercel deployment
+        if: success()
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+        run: |
+          echo "Aguardando deploy na Vercel..."
+          DEPLOYMENT_URL=""
+          for i in $(seq 1 20); do
+            sleep 30
+            RESPONSE=$(curl -s -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v6/deployments?appId=$VERCEL_PROJECT_ID&teamId=$VERCEL_ORG_ID&limit=1")
+            STATUS=$(echo "$RESPONSE" | jq -r '.deployments[0].state // "UNKNOWN"')
+            DEPLOYMENT_URL=$(echo "$RESPONSE" | jq -r '.deployments[0].url // ""')
+            echo "Tentativa $i: status=$STATUS url=$DEPLOYMENT_URL"
+            if [ "$STATUS" = "READY" ]; then
+              echo "Deploy concluído com sucesso!"
+              echo "DEPLOYMENT_URL=$DEPLOYMENT_URL" >> $GITHUB_ENV
+              exit 0
+            elif [ "$STATUS" = "ERROR" ] || [ "$STATUS" = "CANCELED" ]; then
+              echo "Deploy falhou com status: $STATUS"
+              exit 1
+            fi
+          done
+          echo "Timeout: deploy não concluído em 10 minutos"
+          exit 1
+
+      - name: Notify Discord
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          STATUS="${{ job.status }}"
+          DATE="$(date -u '+%Y-%m-%d %H:%M UTC')"
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
+          SITE_URL="${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo.vercel.app' }}"
+          DEPLOY_URL="${{ env.DEPLOYMENT_URL }}"
+
+          if [ "$STATUS" = "success" ]; then
+            COLOR=3066993
+            STATUS_EMOJI="✅"
+            STATUS_TEXT="Sucesso"
+          else
+            COLOR=15158332
+            STATUS_EMOJI="❌"
+            STATUS_TEXT="Falha"
+          fi
+
+          JSON=$(cat <<EOF
+          {
+            "embeds": [{
+              "color": $COLOR,
+              "title": "$STATUS_EMOJI Pipeline Diário — Novo Ciclo",
+              "description": "Atualização automática do site",
+              "fields": [
+                { "name": "Data", "value": "$DATE", "inline": true },
+                { "name": "Status", "value": "$STATUS_TEXT", "inline": true },
+                { "name": "Commit", "value": "[\`${COMMIT_SHA:0:7}\`]($COMMIT_URL)", "inline": true },
+                { "name": "Site", "value": "[novociclo.vercel.app]($SITE_URL)", "inline": true },
+                { "name": "Deploy", "value": "$([ -n "$DEPLOY_URL" ] && echo "[Ver deploy](https://$DEPLOY_URL)" || echo "N/A")", "inline": true }
+              ],
+              "footer": { "text": "Novo Ciclo Bot" },
+              "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+            }]
+          }
+          EOF
+          )
+
+          curl -s -H "Content-Type: application/json" -d "$JSON" "$DISCORD_WEBHOOK_URL"
