@@ -1,7 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import NoNewsToday from "@/components/home/NoNewsToday";
 import type { News } from "@/types";
+
+vi.mock("@/lib/date", async (importOriginal) => {
+  const mod = await importOriginal<typeof import("@/lib/date")>();
+  return {
+    ...mod,
+    getTodayBRT: () => new Date(),
+    getHourBRT: () => 12,
+  };
+});
 
 const mockNews: News[] = [
   {

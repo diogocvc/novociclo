@@ -11,9 +11,17 @@ const { successWithReview } = vi.hoisted(() => {
   return { successWithReview: fn };
 });
 
+const { successWithNews } = vi.hoisted(() => {
+  const fn = vi.fn().mockResolvedValue({
+    success: true,
+    data: { news: [{ id: "1" }] },
+  });
+  return { successWithNews: fn };
+});
+
 vi.mock("@/agents/researcher", () => ({
   ResearcherAgent: vi.fn(function () {
-    return { execute: successWithReview };
+    return { execute: successWithNews };
   }),
 }));
 vi.mock("@/agents/curator", () => ({
@@ -57,6 +65,14 @@ import { runDailyPipeline } from "@/automation/daily-pipeline";
 describe("daily-pipeline", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    successWithReview.mockResolvedValue({
+      success: true,
+      data: { review: { approved: true } },
+    });
+    successWithNews.mockResolvedValue({
+      success: true,
+      data: { news: [{ id: "1" }] },
+    });
   });
 
   it("completes all 8 steps successfully", async () => {
@@ -66,7 +82,20 @@ describe("daily-pipeline", () => {
     expect(result.steps.every((s) => s.success)).toBe(true);
   });
 
+  it("stops early when researcher finds no news", async () => {
+    successWithNews.mockResolvedValueOnce({
+      success: true,
+      data: { news: [] },
+    });
+
+    const result = await runDailyPipeline(new Date("2026-07-14"));
+    expect(result.success).toBe(true);
+    expect(result.steps).toHaveLength(1);
+    expect(result.steps[0].name).toBe("Pesquisador");
+  });
+
   it("stops on persistent failure after retries", async () => {
+    successWithNews.mockResolvedValue({ success: false, error: "Falha persistente" });
     successWithReview.mockResolvedValue({ success: false, error: "Falha persistente" });
 
     const result = await runDailyPipeline(new Date("2026-07-14"));
