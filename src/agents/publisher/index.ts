@@ -30,6 +30,11 @@ export class PublisherAgent extends BaseAgent {
         corpo: string;
       };
 
+      if (!draft?.titulo?.trim() && !draft?.resumo?.trim()) {
+        this.log("Draft sem conteúdo (título e resumo vazios). Arquivo não criado.");
+        return { success: true, data: { skipped: true, reason: "empty_draft" } };
+      }
+
       const allNews = input.news as News[] | undefined;
 
       const date = input.date as Date;

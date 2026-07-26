@@ -186,6 +186,15 @@ export async function runDailyPipeline(
     } else {
       console.log(`[Pipeline] ✅ ${s.name} (${durationMs}ms)`);
     }
+
+    if (s.name === "Pesquisador" && output.success) {
+      const researcherData = output.data as { news?: unknown[] } | undefined;
+      const newsCount = researcherData?.news?.length ?? 0;
+      if (newsCount === 0) {
+        console.log(`[Pipeline] ⏭️ Nenhuma notícia relevante encontrada. Pulando etapas restantes.`);
+        break;
+      }
+    }
   }
 
   const totalDuration = result.steps.reduce((acc, s) => acc + s.durationMs, 0);

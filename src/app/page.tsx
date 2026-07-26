@@ -15,6 +15,7 @@ export default function Home() {
   const today = getTodayBRT();
   const todaySlug = `${today.getFullYear()}/${String(today.getMonth() + 1).padStart(2, "0")}/${String(today.getDate()).padStart(2, "0")}`;
   const hasNewsToday = publishedSlugs.includes(todaySlug);
+  const hasContent = chapter && (chapter.titulo?.trim() || chapter.resumo?.trim());
 
   return (
     <>
@@ -33,7 +34,7 @@ export default function Home() {
       </div>
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
-        {!hasNewsToday && chapters.length > 0 ? (
+        {(!hasNewsToday || !hasContent) && chapters.length > 0 ? (
           <NoNewsToday
             date={today}
             latestNews={getLatestNewsItems(3)}

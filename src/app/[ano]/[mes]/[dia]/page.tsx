@@ -32,6 +32,7 @@ export default async function ChapterPage({ params }: Props) {
   }
 
   const hasNews = chapter.noticia_destaque || chapter.noticias_referencia.length > 0;
+  const hasContent = chapter.titulo?.trim() || chapter.resumo?.trim();
   const latestNews = getLatestNewsItems(3);
 
   return (
@@ -40,7 +41,7 @@ export default async function ChapterPage({ params }: Props) {
       <CountdownBanner />
 
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-16">
-        {hasNews ? (
+        {hasNews && hasContent ? (
           <ChapterContent chapter={chapter} />
         ) : latestNews.length > 0 ? (
           <NoNewsToday
