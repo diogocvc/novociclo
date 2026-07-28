@@ -3,7 +3,9 @@ import path from "path";
 import matter from "gray-matter";
 import type { News } from "@/types";
 
-const CONTENT_DIR = path.join(process.cwd(), "content");
+function getContentDir(): string {
+  return path.join(process.cwd(), "content");
+}
 
 interface RawFrontmatter {
   id: string;
@@ -39,7 +41,7 @@ export function collectMdxFiles(dir: string): string[] {
 }
 
 export function getAllChapters(): RawFrontmatter[] {
-  const mdxFiles = collectMdxFiles(CONTENT_DIR);
+  const mdxFiles = collectMdxFiles(getContentDir());
   const chapters: RawFrontmatter[] = [];
 
   for (const filePath of mdxFiles) {
@@ -64,7 +66,7 @@ export function getChapterBySlugData(slug: string): RawFrontmatter | undefined {
 }
 
 export function getChapterNarrative(slug: string): string {
-  const mdxFiles = collectMdxFiles(CONTENT_DIR);
+  const mdxFiles = collectMdxFiles(getContentDir());
   for (const filePath of mdxFiles) {
     const raw = fs.readFileSync(filePath, "utf-8");
     const { content, data } = matter(raw);
