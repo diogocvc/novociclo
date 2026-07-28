@@ -91,6 +91,9 @@ const EXCLUDED_KEYWORDS = [
   "gramado natural", "grama natural",
   "transfer ban",
   "nfl",
+  "maratonista", "maratona",
+  "desaparecido", "desaparecimento",
+  "doping", "suspensão por doping",
 ];
 
 const EXCLUDED_URL_PATTERNS = [
