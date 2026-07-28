@@ -5,17 +5,15 @@ import { startOfWeek, addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
 
-type DayState = "disabled" | "today" | "active" | "no-news" | "empty";
+type DayState = "disabled" | "today" | "active" | "no-news";
 
 interface Props {
   currentDate?: Date;
-  publishedSlugs?: string[];
   slugsWithNews?: string[];
 }
 
 export default function WeeklyNavigation({
   currentDate,
-  publishedSlugs = [],
   slugsWithNews = [],
 }: Props) {
   const weekDays = useMemo(() => {
@@ -28,7 +26,6 @@ export default function WeeklyNavigation({
       const m = String(date.getMonth() + 1).padStart(2, "0");
       const d = String(date.getDate()).padStart(2, "0");
       const slug = `${y}/${m}/${d}`;
-      const hasPublish = publishedSlugs.includes(slug);
       const hasNews = slugsWithNews.includes(slug);
 
       let state: DayState;
@@ -38,10 +35,8 @@ export default function WeeklyNavigation({
         state = "disabled";
       } else if (hasNews) {
         state = "active";
-      } else if (hasPublish) {
-        state = "no-news";
       } else {
-        state = "empty";
+        state = "no-news";
       }
 
       return {
@@ -52,7 +47,7 @@ export default function WeeklyNavigation({
         slug: state === "active" ? `/${slug}` : undefined,
       };
     });
-  }, [currentDate, publishedSlugs, slugsWithNews]);
+  }, [currentDate, slugsWithNews]);
 
   if (weekDays.length === 0) return null;
 
@@ -99,9 +94,6 @@ export default function WeeklyNavigation({
             )}
             {day.state === "no-news" && (
               <span className="text-xs text-gray-medium mt-1">Sem novidades</span>
-            )}
-            {day.state === "empty" && (
-              <span className="text-xs text-gray-medium mt-1">—</span>
             )}
           </div>
         ))}
