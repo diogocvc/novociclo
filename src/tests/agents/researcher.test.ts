@@ -179,6 +179,74 @@ describe("ResearcherAgent", () => {
     expect(titles).toContain("Seleção Brasileira vence amistoso");
   });
 
+  it("excludes Kings League esports article even when Neymar is mentioned", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews("n1", "Furia bate atual campeão, e G3X elimina DesimpaiN para avançar à semi do Mundial da Kings"),
+        resumo_original:
+          "Equipe de Neymar e Cris Guedes goleou por 5 a 1 o Los Troncos, da Espanha, enquanto o G3X venceu por 6 a 5 o clássico brasileiro marcado pela rivalidade; semis e final serão disputadas neste sábado (1º)",
+        url: "https://ge.globo.com/kings-league/noticia/2026/07/31/furia-bate-atual-campeao-e-g3x-elimina-desimpain-para-avancar-a-semi-do-mundial-da-kings.ghtml",
+      },
+      {
+        ...makeNews("n2", "Seleção Brasileira vence amistoso"),
+        data_publicacao: "2026-07-31T10:00:00-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-31") });
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
+    expect(titles).not.toContain(
+      "Furia bate atual campeão, e G3X elimina DesimpaiN para avançar à semi do Mundial da Kings"
+    );
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+  });
+
+  it("excludes rhythmic gymnastics article even with 'seleção brasileira' in the title", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews("n1", "Seleção brasileira de conjunto se prepara visando vaga olímpica no Mundial de Frankfurt"),
+        resumo_original:
+          "Equipe viaja neste sábado para a competição, que pode garantir vaga antecipada para ao time brasileiro nos Jogos de Los Angeles",
+        url: "https://ge.globo.com/se/ginastica-ritmica/noticia/2026/07/31/selecao-brasileira-de-conjunto-se-prepara-visando-vaga-olimpica-no-mundial-de-frankfurt.ghtml",
+      },
+      {
+        ...makeNews("n2", "CBF traça objetivos da Seleção até 2030"),
+        data_publicacao: "2026-07-31T10:00:00-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-31") });
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
+    expect(titles).not.toContain(
+      "Seleção brasileira de conjunto se prepara visando vaga olímpica no Mundial de Frankfurt"
+    );
+    expect(titles).toContain("CBF traça objetivos da Seleção até 2030");
+  });
+
+  it("excludes articles whose URL is in the blocklist", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews("n1", "Seleção Brasileira anuncia novo calendário de amistosos"),
+        url: "https://ge.globo.com/kings-league/noticia/2026/07/31/furia-bate-atual-campeao-e-g3x-elimina-desimpain-para-avancar-a-semi-do-mundial-da-kings.ghtml",
+      },
+      {
+        ...makeNews("n2", "Seleção Brasileira joga amistoso em setembro"),
+        data_publicacao: "2026-07-31T10:00:00-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-31") });
+    expect(result.success).toBe(true);
+    const news = (result.data as { news: { titulo: string }[] }).news;
+    const titles = news.map((n) => n.titulo);
+    expect(titles).not.toContain("Seleção Brasileira anuncia novo calendário de amistosos");
+    expect(titles).toContain("Seleção Brasileira joga amistoso em setembro");
+  });
+
   it("returns empty result when RSS has no items (no error)", async () => {
     mockFetchAllRss.mockResolvedValueOnce([]);
 
