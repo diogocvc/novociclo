@@ -24,6 +24,10 @@ describe("SEOAgent", () => {
     if (fs.existsSync(rssPath)) {
       fs.unlinkSync(rssPath);
     }
+    const sitemapPath = path.resolve(__dirname, "../fixtures/public/sitemap.xml");
+    if (fs.existsSync(sitemapPath)) {
+      fs.unlinkSync(sitemapPath);
+    }
   });
 
   it("creates RSS feed", async () => {
@@ -39,5 +43,21 @@ describe("SEOAgent", () => {
     const content = fs.readFileSync(rssPath, "utf-8");
     expect(content).toContain("Capítulo de teste");
     expect(content).toContain("2026/07/14");
+  });
+
+  it("creates sitemap listing published chapters", async () => {
+    const result = await agent.execute({
+      date: new Date("2026-07-14"),
+      draft: { titulo: "Capítulo de teste" },
+    });
+
+    expect(result.success).toBe(true);
+
+    const sitemapPath = path.resolve(__dirname, "../fixtures/public/sitemap.xml");
+    expect(fs.existsSync(sitemapPath)).toBe(true);
+    const content = fs.readFileSync(sitemapPath, "utf-8");
+    expect(content).toContain("https://novociclo.vercel.app/2026/07/05");
+    expect(content).toContain("https://novociclo.vercel.app/sobre");
+    expect(content).not.toContain("/manifesto");
   });
 });

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { BaseAgent, type AgentInput, type AgentOutput } from "../base";
+import { generateSitemap } from "@/lib/sitemap";
 
 export class SEOAgent extends BaseAgent {
   constructor() {
@@ -20,8 +21,14 @@ export class SEOAgent extends BaseAgent {
       const day = String(date.getDate()).padStart(2, "0");
 
       const sitemapPath = path.join(publicDir, "sitemap.xml");
-      if (fs.existsSync(sitemapPath)) {
-        this.log("Sitemap exists — would update here in production");
+      try {
+        const sitemap = generateSitemap(siteUrl);
+        fs.writeFileSync(sitemapPath, sitemap, "utf-8");
+        this.log(`Sitemap atualizado: ${sitemapPath}`);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Erro desconhecido";
+        this.log(`Falha ao gerar sitemap: ${message}`, "warn");
       }
 
       const draft = input.draft as { titulo?: string } | undefined;
