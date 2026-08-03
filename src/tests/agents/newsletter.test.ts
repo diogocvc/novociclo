@@ -26,7 +26,7 @@ describe("NewsletterAgent", () => {
     const html = (result.data as { emailHtml: string }).emailHtml;
     expect(html).toContain("Título do capítulo");
     expect(html).toContain("Resumo do capítulo");
-    expect(html).toContain("novociclo.vercel.app");
+    expect(html).toContain("novociclo-red.vercel.app");
     expect(html).toContain("2026/07/14");
   });
 

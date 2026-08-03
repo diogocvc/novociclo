@@ -10,7 +10,7 @@ export class NewsletterAgent extends BaseAgent {
 
     try {
       const draft = input.draft as { titulo: string; resumo: string } | undefined;
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://novociclo.vercel.app";
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://novociclo-red.vercel.app";
       const date = input.date as Date;
 
       const emailHtml = `

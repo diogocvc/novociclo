@@ -16,7 +16,7 @@ async function extractImageFromUrl(url: string): Promise<string | null> {
       signal: controller.signal,
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; NovoCicloBot/1.0; +https://novociclo.vercel.app)",
+          "Mozilla/5.0 (compatible; NovoCicloBot/1.0; +https://novociclo-red.vercel.app)",
       },
     });
     clearTimeout(timeout);

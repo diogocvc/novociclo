@@ -56,8 +56,8 @@ describe("SEOAgent", () => {
     const sitemapPath = path.resolve(__dirname, "../fixtures/public/sitemap.xml");
     expect(fs.existsSync(sitemapPath)).toBe(true);
     const content = fs.readFileSync(sitemapPath, "utf-8");
-    expect(content).toContain("https://novociclo.vercel.app/2026/07/05");
-    expect(content).toContain("https://novociclo.vercel.app/sobre");
+    expect(content).toContain("https://novociclo-red.vercel.app/2026/07/05");
+    expect(content).toContain("https://novociclo-red.vercel.app/sobre");
     expect(content).not.toContain("/manifesto");
   });
 });

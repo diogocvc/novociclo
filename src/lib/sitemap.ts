@@ -1,6 +1,6 @@
 import { getAllChapters } from "@/lib/content";
 
-const DEFAULT_SITE_URL = "https://novociclo.vercel.app";
+const DEFAULT_SITE_URL = "https://novociclo-red.vercel.app";
 
 const STATIC_ROUTES = [
   { path: "", priority: "1.0" },

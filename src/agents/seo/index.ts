@@ -14,7 +14,7 @@ export class SEOAgent extends BaseAgent {
     try {
       const publicDir = path.join(process.cwd(), "public");
       const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL ?? "https://novociclo.vercel.app";
+        process.env.NEXT_PUBLIC_SITE_URL ?? "https://novociclo-red.vercel.app";
       const date = input.date as Date;
       const year = date.getFullYear();
       const month = String(date.getMonth() + 1).padStart(2, "0");

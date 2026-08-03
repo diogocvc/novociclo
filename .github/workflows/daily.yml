@@ -20,7 +20,7 @@ jobs:
       - run: npm run pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo.vercel.app' }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo-red.vercel.app' }}
           NEXT_PUBLIC_CYCLE_START_DATE: ${{ vars.NEXT_PUBLIC_CYCLE_START_DATE || '2026-07-05T00:00:00-03:00' }}
           NEXT_PUBLIC_WORLD_CUP_DATE: ${{ vars.NEXT_PUBLIC_WORLD_CUP_DATE || '2030-06-11T00:00:00-03:00' }}
           NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID || 'G-T9J81CXJ2E' }}
@@ -70,7 +70,7 @@ jobs:
           DATE="$(date -u '+%Y-%m-%d %H:%M UTC')"
           COMMIT_SHA="${{ github.sha }}"
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
-          SITE_URL="${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo.vercel.app' }}"
+          SITE_URL="${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo-red.vercel.app' }}"
           DEPLOY_URL="${{ env.DEPLOYMENT_URL }}"
 
           if [ "$STATUS" = "success" ]; then
@@ -93,7 +93,7 @@ jobs:
                 { "name": "Data", "value": "$DATE", "inline": true },
                 { "name": "Status", "value": "$STATUS_TEXT", "inline": true },
                 { "name": "Commit", "value": "[\`${COMMIT_SHA:0:7}\`]($COMMIT_URL)", "inline": true },
-                { "name": "Site", "value": "[novociclo.vercel.app]($SITE_URL)", "inline": true },
+                { "name": "Site", "value": "[novociclo-red.vercel.app]($SITE_URL)", "inline": true },
                 { "name": "Deploy", "value": "$([ -n "$DEPLOY_URL" ] && echo "[Ver deploy](https://$DEPLOY_URL)" || echo "N/A")", "inline": true }
               ],
               "footer": { "text": "Novo Ciclo Bot" },
