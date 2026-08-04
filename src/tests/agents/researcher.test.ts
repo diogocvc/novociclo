@@ -354,4 +354,63 @@ describe("ResearcherAgent", () => {
     const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
     expect(titles).toContain("Seleção Brasileira define preparação para as Eliminatórias");
   });
+
+  it("excludes today's off-context news (04/08): family, all-time lists, former-player nostalgia, other FIFA competitions and relative-clause player references", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "Filho de Neymar revela que não seguirá o pai: 'Não sou muito do esporte'",
+          "https://www.band.com.br/entretenimento/filho-de-neymar-revela-que-nao-seguira-o-pai-nao-sou-muito-do-esporte-202608040917",
+        ),
+        resumo_original:
+          "Davi Lucca diz que pretende trabalhar no Instituto Neymar Jr., que fez leilão na noite de segunda-feira (3)",
+      },
+      {
+        ...makeNews(
+          "n2",
+          'Neymar "pede" dois brasileiros em lista de maiores goleiros da história',
+          "https://www.band.com.br/esportes/neymar-pede-dois-brasileiros-em-lista-de-maiores-goleiros-da-historia-202608041136",
+        ),
+        resumo_original: "Ranking colocou Lev Yashin como o maior arqueiro de toda a história",
+      },
+      {
+        ...makeNews(
+          "n3",
+          "Roberto Carlos santista e mais: para que times ídolos torciam na infância",
+          "https://placar.com.br/placar/roberto-carlos-santista-e-mais-para-que-times-idolos-torciam-na-infancia",
+        ),
+        resumo_original:
+          "Neymar, Rivellino, Sócrates e Ronaldo fizeram história por clubes diferentes dos que torciam quando crianças; e qual era o time do coração de Pelé?",
+      },
+      {
+        ...makeNews(
+          "n4",
+          "Fifa lança plano de direitos humanos e sustentabilidade para Copa do Mundo Feminina no Brasil",
+          "https://ge.globo.com/futebol/copa-do-mundo-feminina/noticia/2026/08/04/fifa-lanca-plano-de-direitos-humanos-e-sustentabilidade-para-copa-do-mundo-feminina-no-brasil.ghtml",
+        ),
+        resumo_original:
+          "A Fifa lançou a estratégia de sustentabilidade e direitos humanos da entidade para a Copa do Mundo Feminina de 2027, no Brasil",
+      },
+      {
+        ...makeNews(
+          "n5",
+          'Goleiro da Noruega que "discutiu" com Neymar assina com gigante alemão',
+          "https://www.band.com.br/esportes/goleiro-noruegues-que-eliminou-o-brasil-na-copa-e-provocou-neymar-assina-com-o-rb-leipzig-202608040857",
+        ),
+        resumo_original: "Orjan Nyland foi um dos grandes destaques da equipe europeia no Mundial",
+      },
+      makeNews("n6", "Seleção Brasileira vence amistoso"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("Filho de Neymar revela que não seguirá o pai: 'Não sou muito do esporte'");
+    expect(titles).not.toContain('Neymar "pede" dois brasileiros em lista de maiores goleiros da história');
+    expect(titles).not.toContain("Roberto Carlos santista e mais: para que times ídolos torciam na infância");
+    expect(titles).not.toContain("Fifa lança plano de direitos humanos e sustentabilidade para Copa do Mundo Feminina no Brasil");
+    expect(titles).not.toContain('Goleiro da Noruega que "discutiu" com Neymar assina com gigante alemão');
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+  });
 });

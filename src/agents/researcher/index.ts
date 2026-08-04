@@ -74,6 +74,8 @@ const EXCLUDED_KEYWORDS = [
   "futsal",
   "futebol de areia",
   "futebol feminino",
+  "copa do mundo feminina", "copa feminina", "mundial feminino",
+  "copa das nações",
   "fisiculturismo",
   "liga das nações",
   "kings league",
@@ -109,6 +111,8 @@ const EXCLUDED_URL_PATTERNS = [
   "/atletismo/", "/natacao/", "/surfe/", "/skate/",
   "/mma/", "/combate/", "/judo/", "/boxe/",
   "/nfl/", "/futebol-americano/",
+  "/feminina/", "/copa-do-mundo-feminina/", "/futebol-feminino/",
+  "/entretenimento/",
   "/sp/", "/rj/", "/ce/", "/rs/", "/mg/", "/ba/",
   "/pr/", "/pe/", "/sc/", "/df/", "/es/", "/go/",
   "/ac/", "/al/", "/am/", "/ap/", "/ma/", "/mt/",
@@ -180,6 +184,47 @@ const FORMER_PLAYER_OR_HEALTH = [
   "internado", "hospitalizado",
 ];
 
+const FAMILY_RELATIVE_PREFIXES = [
+  "filho de", "filha de",
+  "esposa de", "esposo de", "mulher de", "marido de",
+  "namorada de", "namorado de", "noiva de",
+  "irmão de", "irmao de", "irmã de", "irma de",
+  "pai de", "mãe de", "mae de",
+  "ex-mulher de", "ex-noiva de",
+];
+
+const ALL_TIME_LIST_PHRASES = [
+  "lista de maiores goleiros da história",
+  "maiores goleiros da história",
+  "maiores jogadores da história",
+  "melhores goleiros da história",
+  "melhores jogadores da história",
+  "ranking dos maiores da história",
+];
+
+const FORMER_PLAYERS = [
+  "roberto carlos",
+  "ronaldo", "ronaldinho",
+  "kaká", "kaka",
+  "romário", "romario",
+  "pelé", "pele",
+  "zico",
+  "sócrates", "socrates",
+  "rivellino", "rivelino",
+  "garrincha",
+  "tostão", "tostao",
+  "zagallo",
+  "cafu",
+  "rivaldo",
+];
+
+const NOSTALGIA_KEYWORDS = [
+  "torciam",
+  "torcia na infância", "torcia na infancia",
+  "quando criança", "quando crianças",
+  "time do coração", "time do coracao",
+];
+
 function cleanText(raw: string): string {
   return raw.replace(/<[^>]*>/g, " ");
 }
@@ -212,6 +257,25 @@ function hasDisguisedClubOrOffTopicNews(title: string, resumo: string): boolean 
   return false;
 }
 
+function hasFamilyRelativeContext(title: string): boolean {
+  const t = title.toLowerCase().trim();
+  const hasPlayer = SELEÇÃO_NAMES.some((n) => t.includes(n));
+  if (!hasPlayer) return false;
+  return FAMILY_RELATIVE_PREFIXES.some((p) => t.startsWith(p));
+}
+
+function hasAllTimeListOpinion(title: string, resumo: string): boolean {
+  const text = buildText(title, resumo);
+  return ALL_TIME_LIST_PHRASES.some((p) => text.includes(p));
+}
+
+function hasFormerPlayerLegacy(title: string, resumo: string): boolean {
+  const t = title.toLowerCase().trim();
+  if (FORMER_PLAYERS.some((p) => t.startsWith(p))) return true;
+  const text = buildText(title, resumo);
+  return NOSTALGIA_KEYWORDS.some((k) => text.includes(k));
+}
+
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
   const urlLower = url.toLowerCase();
   const fullText = buildText(title, resumo);
@@ -220,6 +284,7 @@ function hasExcludedContent(title: string, resumo: string, url: string): boolean
 
   if (EXCLUDED_KEYWORDS.some((kw) => focused.includes(kw))) return true;
   if (EXCLUDED_URL_PATTERNS.some((p) => urlLower.includes(p))) return true;
+  if (hasFamilyRelativeContext(title)) return true;
 
   const hasNationality = OTHER_NATIONALITIES.some((n) => fullText.includes(n));
   const hasSelecao = fullText.includes("seleção") || fullText.includes("selecao");
@@ -252,14 +317,20 @@ function hasOffTopicContext(title: string, resumo: string, url: string): boolean
 
   const temJogadorSelecao = SELEÇÃO_NAMES.some((n) => titleLower.includes(n));
   const temPosicionamentoSecundario = SECONDARY_POSITIONING.some((p) => text.includes(p));
-  const jogadorPrincipal = temJogadorSelecao && !temPosicionamentoSecundario;
+  const temJogadorEmClausulaRelativa = SELEÇÃO_NAMES.some((n) => {
+    const idxQue = titleLower.lastIndexOf(" que ");
+    const idxPlayer = titleLower.indexOf(n);
+    return idxPlayer !== -1 && idxQue !== -1 && idxPlayer > idxQue;
+  });
+  const jogadorPrincipal =
+    temJogadorSelecao && !temPosicionamentoSecundario && !temJogadorEmClausulaRelativa;
 
   if (jogadorPrincipal) return false;
 
   const hasForeignClub = FOREIGN_CLUBS.some((c) => text.includes(c));
   const internationalUrl = urlLower.includes("/futebol-internacional/");
 
-  return hasForeignClub || temPosicionamentoSecundario || internationalUrl;
+  return hasForeignClub || temPosicionamentoSecundario || temJogadorEmClausulaRelativa || internationalUrl;
 }
 
 function calculateScore(title: string, resumo: string): { score: number; matchedGroups: number } {
@@ -288,6 +359,10 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   if (hasFormerPlayerHealth) return false;
 
   if (hasStrongSelecaoContext(text)) return true;
+
+  if (hasAllTimeListOpinion(title, resumo ?? "")) return false;
+  if (hasFormerPlayerLegacy(title, resumo ?? "")) return false;
+
   if (titleStartsWithSelecaoName(title)) return true;
 
   const { score } = calculateScore(title, resumo ?? "");

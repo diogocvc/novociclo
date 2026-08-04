@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 04/08/2026 (filtro de relevância em camadas + regra editorial de escopo; jogador da Seleção como foco mantém Vini/Endrick; 5 notícias off-context removidas; resumo do dia reescrito; ADR-009 no DECISIONS.md)
+**Última atualização:** 04/08/2026 (capítulo 04/08 limpo de 5 notícias off-context; filtro ampliado: outras competições da Fifa, família/entretenimento, listas históricas, ex-jogadores/legado e sujeito em oração relativa; ADR-010 no DECISIONS.md)
 
 ---
 
@@ -103,6 +103,8 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Limpeza de Conteúdo Off-Context** | ✅ Concluído |
 | **Consistência Foco no Jogador** | ✅ Concluído |
 | **Resumo do Dia 03/08** | ✅ Concluído |
+| **Limpeza Off-Context 04/08** | ✅ Concluído |
+| **Filtro de Relevância 04/08 (ADR-010)** | ✅ Concluído |
 
 ---
 
@@ -211,6 +213,15 @@ novo-ciclo/
 * ✅ Testes de regressão adicionados em `src/tests/agents/researcher.test.ts` (5 casos off-context excluídos, Endrick/Roma mantido, contexto forte mantido em URL `/futebol-internacional/`)
 * ✅ Ajuste de consistência: jogador atual da Seleção como **foco** mantém notícia de clube estrangeiro (Vini Jr. → Arsenal/Real Madrid, Endrick → Roma); veto de clube/URL internacional só derruba quando o jogador é secundário ("concorrente de", "disputar vaga com") — padrão cego `/futebol/futebol-internacional/` do ge removido
 * ✅ Capítulo 03/08 restaurado e re-limpo: 5 off-context removidos, Vini Jr. e Endrick mantidos; `resumo` do dia e parágrafo do corpo reescritos (removida menção ao Kléberson)
+* ✅ Capítulo 04/08 limpo de 5 notícias off-context (Filho de Neymar, Neymar/lista de goleiros, Roberto Carlos/ídolos na infância, Fifa/Copa do Mundo Feminina e Goleiro da Noruega/RB Leipzig); destaque promovido para "Infantino marca reunião..." e `resumo`/corpo reescritos (DE-6)
+* ✅ 5 URLs de 04/08 adicionadas ao `news-blocklist.json` (URL da Placar sem query string para casar qualquer variante)
+* ✅ Filtro do Researcher ampliado (ADR-010):
+  * **Veto outras competições da Fifa** — keywords `copa do mundo feminina`, `copa feminina`, `mundial feminino`, `copa das nações` + URL `/feminina/`, `/copa-do-mundo-feminina/`, `/futebol-feminino/` (corrige Fifa/Copa Feminina)
+  * **Veto família/entretenimento** — título iniciando com parentesco (`filho de`, `esposa de`, `irmão de`, `mãe de`…) + jogador da Seleção ⇒ exclui; URL `/entretenimento/` bloqueada (corrige Filho de Neymar)
+  * **Veto listas históricas/opinião** — `lista de maiores goleiros da história`, `maiores jogadores da história` etc. ⇒ exclui (corrige Neymar/lista)
+  * **Veto ex-jogadores/legado** — título iniciando com ex-jogador (Roberto Carlos, Ronaldo, Ronaldinho, Kaká, Pelé, Zico, Sócrates…) ou nostalgia (`torciam`, `quando crianças`, `time do coração`) ⇒ exclui (corrige Roberto Carlos)
+  * **Sujeito em oração relativa** — jogador após `que …` no título deixa de ser "foco" ("goleiro da Noruega que discutiu com Neymar" excluído; "Arteta conversou com Vini Jr." e "Endrick é monitorado pela Roma" mantidos)
+* ✅ Testes de regressão: 5 casos de 04/08 excluídos (96 testes no total, lint e typecheck limpos)
 
 ## Decisões editoriais (04/08/2026)
 

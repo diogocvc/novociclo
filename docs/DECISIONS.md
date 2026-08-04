@@ -386,6 +386,48 @@ Estabelecer a regra editorial de relevância em camadas:
 
 ---
 
+# ADR-010
+
+## Título
+
+Ampliação do filtro de relevância do Researcher (outras competições da Fifa, família/entretenimento, listas históricas e ex-jogadores/legado).
+
+### Status
+
+Aceita
+
+### Data
+
+04/08/2026
+
+### Contexto
+
+Cinco notícias off-context entraram no capítulo de 04/08: Copa do Mundo Feminina (outra competição da Fifa), "Filho de Neymar" (família/entretenimento), Neymar em lista de maiores goleiros (opinião/all-time), Roberto Carlos/ídolos na infância (nostalgia de ex-jogadores) e goleiro da Noruega que discutiu com Neymar (jogador de outra seleção citando um da Seleção como referência). O filtro em camadas do ADR-009 cobria apenas contexto de saúde/ex-jogador e posicionamento secundário de clube, sem tratar esses padrões.
+
+### Decisão
+
+Estender o filtro em camadas com cinco regras adicionais:
+
+* **Outras competições da Fifa** (absoluto): keywords `copa do mundo feminina`, `copa feminina`, `mundial feminino`, `copa das nações` e padrões de URL `/feminina/`, `/copa-do-mundo-feminina/`, `/futebol-feminino/`.
+* **Família/entretenimento** (absoluto): título iniciando com parentesco (`filho de`, `esposa de`, `irmão de`, `mãe de` etc.) + jogador da Seleção ⇒ exclui; URL `/entretenimento/` bloqueada.
+* **Listas históricas/opinião** (relativo, após contexto forte): `lista de maiores goleiros da história`, `maiores jogadores da história`, `melhores goleiros da história` etc. ⇒ exclui, salvo contexto forte da Seleção.
+* **Ex-jogadores/legado** (relativo): título iniciando com ex-jogador da Seleção (Roberto Carlos, Ronaldo, Ronaldinho, Kaká, Romário, Pelé, Zico, Sócrates, Rivellino, Garrincha…) ou keywords de nostalgia (`torciam`, `quando crianças`, `time do coração`) ⇒ exclui, salvo contexto forte.
+* **Sujeito em oração relativa**: jogador da Seleção após `que …` no título deixa de ser o foco ("goleiro da Noruega que discutiu com Neymar"), sem afetar "Arteta conversou com Vini Jr." nem "Endrick é monitorado pela Roma, que estuda…".
+
+### Alternativas consideradas
+
+* Mover Neymar para a lista de ex-jogadores — rejeitado: mantido como jogador atual, com os vetos de família/listas cobrindo as notícias off-context.
+* Adicionar clubes estrangeiros um a um (ex.: "RB Leipzig") — rejeitado: abordagem pontual; a regra de sujeito em oração relativa cobre o caso genericamente.
+* Rodar cleanup em todos os capítulos — rejeitado nesta iteração; limpeza restrita ao capítulo de 04/08.
+
+### Consequências
+
+* Menos notícias fora do contexto editorial (família, entretenimento, outras competições e conteúdo de ex-jogadores).
+* Comportamento consistente entre fontes (ge/Placar/Band).
+* Ao remover notícias de um capítulo já gerado, o resumo e o corpo devem ser reescritos para a listagem final (mantém DE-6).
+
+---
+
 # Processo para novas decisões
 
 Uma nova ADR deve ser criada quando houver mudanças em:
