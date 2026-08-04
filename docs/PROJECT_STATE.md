@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 04/08/2026 (filtro de relevância em camadas no Researcher; jogador da Seleção como foco mantém notícias de clube — Vini/Endrick; 5 notícias off-context de 03/08 removidas; resumo do dia reescrito)
+**Última atualização:** 04/08/2026 (filtro de relevância em camadas + regra editorial de escopo; jogador da Seleção como foco mantém Vini/Endrick; 5 notícias off-context removidas; resumo do dia reescrito; ADR-009 no DECISIONS.md)
 
 ---
 
@@ -211,6 +211,17 @@ novo-ciclo/
 * ✅ Testes de regressão adicionados em `src/tests/agents/researcher.test.ts` (5 casos off-context excluídos, Endrick/Roma mantido, contexto forte mantido em URL `/futebol-internacional/`)
 * ✅ Ajuste de consistência: jogador atual da Seleção como **foco** mantém notícia de clube estrangeiro (Vini Jr. → Arsenal/Real Madrid, Endrick → Roma); veto de clube/URL internacional só derruba quando o jogador é secundário ("concorrente de", "disputar vaga com") — padrão cego `/futebol/futebol-internacional/` do ge removido
 * ✅ Capítulo 03/08 restaurado e re-limpo: 5 off-context removidos, Vini Jr. e Endrick mantidos; `resumo` do dia e parágrafo do corpo reescritos (removida menção ao Kléberson)
+
+## Decisões editoriais (04/08/2026)
+
+Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-009** (docs/DECISIONS.md):
+
+* **DE-1 — Escopo editorial**: notícias sobre jogadores/equipes de outras seleções na Copa 2026 estão fora do escopo, a menos que tenham relação direta com a Seleção Brasileira ou peso relevante para a Copa de 2030.
+* **DE-2 — Jogador da Seleção como foco**: notícia de clube estrangeiro é mantida quando o jogador atual da Seleção é o foco (Vini Jr. → Arsenal/Real Madrid; Endrick → Roma). Se o jogador é citado só como referência secundária ("concorrente de", "disputar vaga com", "rival de"), a notícia é descartada.
+* **DE-3 — Ex-jogador/saúde**: conteúdo de ex-jogador (estado de saúde, "ex-jogador", aposentado) é off-context, mesmo contendo "seleção brasileira".
+* **DE-4 — Filtro em camadas**: o Researcher usa sinais fortes + jogador-foco + veto off-context no lugar do somatório cego de pesos; padrão cego de URL `/futebol-internacional/` do ge removido para consistência entre ge/Placar/Band.
+* **DE-5 — Falsos positivos**: matching de clubes por fronteira de palavra ("vitória" ≠ "vitórias"); exclusão por keyword limitada ao título + 200 caracteres do resumo com HTML removido.
+* **DE-6 — Redação do capítulo**: ao remover notícias de um capítulo já gerado, reescrever o resumo e o corpo para a listagem final (o LLM escreve antes do filtro).
 
 ## Próxima Iteração — Prioridade Alta
 

@@ -344,6 +344,48 @@ O Novo Ciclo será uma instância dessa arquitetura.
 
 ---
 
+# ADR-009
+
+## Título
+
+Filtro de relevância em camadas para o Researcher (escopo editorial).
+
+### Status
+
+Aceita
+
+### Data
+
+04/08/2026
+
+### Contexto
+
+O agregador passou a coletar de mais fontes (Placar, Band Esportes) e o somatório cego de pesos no Researcher permitiu a entrada de notícias fora do escopo do ciclo da Seleção Brasileira: jogadores de outras seleções na Copa do Mundo 2026, ex-jogadores em contexto de saúde e notícias de clube estrangeiro que citam um jogador da Seleção apenas como referência secundária.
+
+Cinco notícias off-context no capítulo de 03/08 motivaram a revisão do filtro.
+
+### Decisão
+
+Estabelecer a regra editorial de relevância em camadas:
+
+* **Sinais fortes** (seleção brasileira, eliminatórias, convocação/convocações, Copa 2030, CBF, Ancelotti) ⇒ inclui diretamente.
+* **Jogador da Seleção como foco** ⇒ mantém notícia de clube estrangeiro (Vini Jr. → Arsenal/Real Madrid; Endrick → Roma).
+* **Veto off-context** (clube estrangeiro, posicionamento secundário "concorrente de"/"disputar vaga com"/"rival de", URL `/futebol-internacional/` sem contexto forte) ⇒ exclui, exceto quando o jogador da Seleção é o foco.
+* **Ex-jogador/saúde** ("estado de saúde", "ex-jogador", aposentado) ⇒ exclui mesmo contendo "seleção brasileira" no texto.
+
+### Alternativas consideradas
+
+* Exclusão cega por URL `/futebol-internacional/` — rejeitada por ser inconsistente entre fontes (ge/Placar/Band).
+* Somatório cego de pesos por keyword — rejeitado por permitir falsos positivos e falsos negativos.
+
+### Consequências
+
+* Menos notícias fora do contexto editorial.
+* Consistência de comportamento entre fontes.
+* Ao remover notícias de um capítulo já gerado, o resumo e o corpo devem ser reescritos para a listagem final (o LLM escreve antes do filtro).
+
+---
+
 # Processo para novas decisões
 
 Uma nova ADR deve ser criada quando houver mudanças em:
