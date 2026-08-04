@@ -141,9 +141,62 @@ const OTHER_NATIONALITIES = [
   "bélgica", "belga",
 ];
 
-function hasDisguisedClubOrOffTopicNews(title: string, resumo: string, url: string): boolean {
-  const text = `${title} ${resumo}`.toLowerCase();
-  const temClube = CLUBES_BRASILEIROS.some((c) => text.includes(c));
+const SELEÇÃO_STRONG_PHRASES = [
+  "seleção brasileira", "selecao brasileira",
+  "seleção masculina", "selecao masculina",
+  "eliminatórias", "eliminatorias",
+  "convocação", "convocacoes", "convocações",
+  "convocado", "convocados", "convocada", "convocadas",
+  "copa do mundo 2030", "copa 2030", "mundial 2030",
+  "cbf", "confederação brasileira de futebol",
+  "ancelotti",
+];
+
+const SELEÇÃO_NAMES = [
+  "neymar",
+  "vinicius jr", "vinicius junior", "vini jr",
+  "rodrygo", "endrick",
+];
+
+const FOREIGN_CLUBS = [
+  "real madrid", "barcelona", "atlético de madrid", "atletico de madrid",
+  "liverpool", "manchester city", "manchester united", "arsenal", "chelsea",
+  "psg", "bayern", "juventus", "milan", "roma", "napoli",
+  "inter de milão", "inter de milao", "borussia", "ajax",
+  "porto", "benfica", "sevilha", "valencia", "leverkusen",
+  "colo-colo", "colo colo", "olympique",
+];
+
+const SECONDARY_POSITIONING = [
+  "concorrente de", "concorrente do",
+  "disputar vaga com", "disputar a vaga com", "disputa por vaga",
+  "rival de", "companheiro de",
+  "comparado a", "comparado com", "à altura de", "a altura de",
+];
+
+const FORMER_PLAYER_OR_HEALTH = [
+  "estado de saúde", "estado de saude",
+  "saúde de", "saude de",
+  "ex-jogador", "aposentado", "aposentada",
+  "internado", "hospitalizado",
+];
+
+function cleanText(raw: string): string {
+  return raw.replace(/<[^>]*>/g, " ");
+}
+
+function buildText(title: string, resumo?: string): string {
+  return cleanText(`${title} ${resumo ?? ""}`).toLowerCase();
+}
+
+function hasTerm(text: string, term: string): boolean {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\b${escaped}\\b`, "i").test(text);
+}
+
+function hasDisguisedClubOrOffTopicNews(title: string, resumo: string): boolean {
+  const text = buildText(title, resumo);
+  const temClube = CLUBES_BRASILEIROS.some((c) => hasTerm(text, c));
   const temSelecaoOuCbf = text.includes("seleção") || text.includes("selecao") || text.includes("cbf");
   const temFifa = text.includes("fifa");
   const temCopa = text.includes("copa do mundo");
@@ -161,29 +214,51 @@ function hasDisguisedClubOrOffTopicNews(title: string, resumo: string, url: stri
 }
 
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
-  const text = `${title} ${resumo}`;
   const urlLower = url.toLowerCase();
+  const fullText = buildText(title, resumo);
+  const cleanResumo = cleanText(resumo).toLowerCase();
+  const focused = `${title.toLowerCase()} ${cleanResumo.slice(0, 200)}`;
 
-  if (EXCLUDED_KEYWORDS.some((kw) => text.includes(kw))) return true;
+  if (EXCLUDED_KEYWORDS.some((kw) => focused.includes(kw))) return true;
   if (EXCLUDED_URL_PATTERNS.some((p) => urlLower.includes(p))) return true;
 
-  const hasNationality = OTHER_NATIONALITIES.some((n) => text.includes(n));
-  const hasSelecao = text.includes("seleção") || text.includes("selecao");
+  const hasNationality = OTHER_NATIONALITIES.some((n) => fullText.includes(n));
+  const hasSelecao = fullText.includes("seleção") || fullText.includes("selecao");
   const hasBrasil =
-    text.includes("brasil") ||
-    text.includes("brasileira") ||
-    text.includes("brasileiro") ||
-    text.includes("brasileiras") ||
-    text.includes("brasileiros");
+    fullText.includes("brasil") ||
+    fullText.includes("brasileira") ||
+    fullText.includes("brasileiro") ||
+    fullText.includes("brasileiras") ||
+    fullText.includes("brasileiros");
 
   if (hasNationality && hasSelecao && !hasBrasil) return true;
-  if (hasDisguisedClubOrOffTopicNews(title, resumo, url)) return true;
+  if (hasDisguisedClubOrOffTopicNews(title, resumo)) return true;
 
   return false;
 }
 
+function hasStrongSelecaoContext(text: string): boolean {
+  return SELEÇÃO_STRONG_PHRASES.some((p) => text.includes(p));
+}
+
+function titleStartsWithSelecaoName(title: string): boolean {
+  const t = title.toLowerCase().trim();
+  return SELEÇÃO_NAMES.some((n) => t.startsWith(n));
+}
+
+function hasOffTopicContext(title: string, resumo: string, url: string): boolean {
+  const text = buildText(title, resumo);
+  const urlLower = url.toLowerCase();
+
+  const hasForeignClub = FOREIGN_CLUBS.some((c) => text.includes(c));
+  const hasSecondaryPositioning = SECONDARY_POSITIONING.some((p) => text.includes(p));
+  const internationalUrl = urlLower.includes("/futebol-internacional/");
+
+  return hasForeignClub || hasSecondaryPositioning || internationalUrl;
+}
+
 function calculateScore(title: string, resumo: string): { score: number; matchedGroups: number } {
-  const text = `${title} ${resumo}`.toLowerCase();
+  const text = buildText(title, resumo);
   let score = 0;
   let matchedGroups = 0;
 
@@ -199,20 +274,27 @@ function calculateScore(title: string, resumo: string): { score: number; matched
 }
 
 export function isRelevant(title: string, resumo?: string, url?: string): boolean {
-  const safeResumo = (resumo ?? "").toLowerCase();
   const safeUrl = (url ?? "").toLowerCase();
-  const text = `${title.toLowerCase()} ${safeResumo}`;
+  const text = buildText(title, resumo);
 
-  if (hasExcludedContent(text, safeResumo, safeUrl)) return false;
+  if (hasExcludedContent(title, resumo ?? "", safeUrl)) return false;
 
-  const { score, matchedGroups } = calculateScore(title, safeResumo);
-  return score >= 3;
+  const hasFormerPlayerHealth = FORMER_PLAYER_OR_HEALTH.some((m) => text.includes(m));
+  if (hasFormerPlayerHealth) return false;
+
+  if (hasStrongSelecaoContext(text)) return true;
+  if (titleStartsWithSelecaoName(title)) return true;
+
+  const { score } = calculateScore(title, resumo ?? "");
+  if (score >= 3) {
+    return !hasOffTopicContext(title, resumo ?? "", safeUrl);
+  }
+  return false;
 }
 
 export function isBlocked(title: string, resumo?: string, url?: string): boolean {
-  const safeResumo = (resumo ?? "").toLowerCase();
   const safeUrl = (url ?? "").toLowerCase();
-  const text = `${title.toLowerCase()} ${safeResumo}`;
+  const text = buildText(title, resumo);
 
   if (safeUrl && blocklist.urls.some((u) => safeUrl.includes(u))) return true;
   if (blocklist.keywords.some((kw) => text.includes(kw.toLowerCase()))) return true;

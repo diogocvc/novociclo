@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 16/07/2026 (cooldown LLM, blocklist de notícias, GA, lint zerado)
+**Última atualização:** 04/08/2026 (filtro de relevância em camadas no Researcher; 5 notícias off-context de 03/08 bloqueadas; cleanup de capítulos históricos com conteúdo de outras seleções)
 
 ---
 
@@ -96,6 +96,11 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Blocklist Notícias**  | ✅ Concluído     |
 | **Google Analytics**    | ✅ Concluído     |
 | **Lint Zero**           | ✅ Concluído     |
+| **Novas Fontes de Notícias** | ✅ Concluído |
+| **Correção URL do Site** | ✅ Concluído |
+| **Filtro de Relevância em Camadas** | ✅ Concluído |
+| **Blocklist Off-Context 03/08** | ✅ Concluído |
+| **Limpeza de Conteúdo Off-Context** | ✅ Concluído |
 
 ---
 
@@ -157,8 +162,8 @@ novo-ciclo/
 * ✅ Pipeline diário orquestrado (automation/daily-pipeline.ts)
 * ✅ GitHub Actions (test.yml, deploy.yml, daily.yml)
 * ✅ Configuração Vercel
-* ✅ Deploy publicado em novociclo.vercel.app
-* ✅ Testes automatizados (86 testes em 21 arquivos)
+* ✅ Deploy publicado em novociclo-red.vercel.app (o domínio novociclo.vercel.app passou a servir outro app)
+* ✅ Testes automatizados (91 testes em 21 arquivos)
 * ✅ RSS parser real (src/lib/rss.ts com fast-xml-parser)
 * ✅ Pipeline end-to-end rodou com RSS real e backoff exponencial
 * ✅ Refinamento de prompts e docs dos agentes
@@ -186,7 +191,22 @@ novo-ciclo/
 * ✅ Script `scripts:block-news` para adicionar URLs/keywords ao blocklist
 * ✅ Researcher ignora itens bloqueados e busca próximos do RSS
 * ✅ Lint zerado (8 erros corrigidos: unescaped entities, setState em effect, unused imports/vars)
-* ✅ Testes e typecheck passando (86 testes, 0 erros)
+* ✅ Testes e typecheck passando (91 testes, 0 erros)
+* ✅ Removido capítulo 02/08 (inteiramente off-topic: transferência de Rodri Real Madrid/Manchester City, notícia UOL); arquivo `content/2026/08/02.mdx` apagado e URL adicionada à blocklist de notícias
+* ✅ URL do site corrigida para `novociclo-red.vercel.app` em sitemap, RSS, código (seo/newsletter/sitemap), workflow diário, `.env.example` e testes (era novociclo.vercel.app)
+* ✅ Novas fontes de notícias adicionadas em `src/config/sources.ts`: **Placar** (RSS `placar.com.br/rss.xml`) e **Band Esportes** (RSS `rss.bs.vibra.digital/feed.xml?site=esportes`)
+* ✅ Lance! e TNT Sports adicionadas como `tipo: "site"` (não possuem RSS público; decisão: manter padrão das demais fontes site)
+* ✅ Página de créditos atualizada com as novas fontes (CNN Brasil, Lance!, TNT Sports, Placar e Band Esportes)
+* ✅ Decisão registrada: fontes sem RSS público (Lance, TNT, ESPN, CBF, FIFA, CNN) permanecem como `tipo: "site"` — o pipeline (Researcher) só coleta fontes com `rss` definido; site são placeholders de referência na página de créditos
+* ✅ Filtro de relevância do Researcher reestruturado em camadas (5 notícias off-context de 03/08 removidas e bloqueadas):
+  * **Sinais fortes** (seleção brasileira, eliminatórias, convocação/convocações, copa 2030, CBF, Ancelotti) ⇒ inclui direto
+  * **Sujeito no título** (manchete começa com jogador da Seleção, ex.: "Endrick é monitorado pela Roma") ⇒ mantém (foco no jogador)
+  * **Veto off-context** (clube estrangeiro, posicionamento secundário — "concorrente de", "disputar vaga com" — e URL `/futebol-internacional/` sem contexto forte) ⇒ exclui quando não há contexto forte
+  * **Ex-jogador/saúde** ("estado de saúde", "ex-jogador", "aposentado") ⇒ exclui mesmo com contexto forte (caso Kléberson)
+  * **Falsos positivos corrigidos**: matching de clubes brasileiros por fronteira de palavra (evita "vitória" dentro de "vitórias"); exclusão por keywords limitada ao título + primeiros 200 caracteres do resumo com HTML removido (evita derrubar notícia on-topic que apenas menciona outra competição no corpo); Ancelotti e "convocações" agora contam como contexto forte
+* ✅ 5 URLs off-context de 03/08 adicionadas ao `news-blocklist.json` (Kléberson/saúde, Vozinha/Marrocos, Cucurella/medalha, Carlos Espí vs Endrick, Real Madrid vende concorrente de Endrick)
+* ✅ `cleanup-chapters` reaplicado: capítulos 16, 17, 18, 19, 20, 23 e 29 de julho limpos de conteúdo de outras seleções na Copa 2026 (Ferran Torres, Cucurella, Messi, Enzo Fernandez, Iniesta, Copa 2026 records etc.)
+* ✅ Testes de regressão adicionados em `src/tests/agents/researcher.test.ts` (5 casos off-context excluídos, Endrick/Roma mantido, contexto forte mantido em URL `/futebol-internacional/`)
 
 ## Próxima Iteração — Prioridade Alta
 

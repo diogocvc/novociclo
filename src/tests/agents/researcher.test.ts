@@ -255,4 +255,80 @@ describe("ResearcherAgent", () => {
     const news = (result.data as { news: unknown[] }).news;
     expect(news).toHaveLength(0);
   });
+
+  it("excludes off-context news: foreign players, foreign clubs and former-player health", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "O que se sabe sobre o estado de saúde de Kléberson",
+          "https://www.band.com.br/esportes/o-que-se-sabe-sobre-o-estado-de-saude-de-kleberson-202608031540",
+        ),
+        resumo_original: "Ex-jogador da seleção brasileira, campeão do mundo em 2002, passa bem",
+      },
+      makeNews(
+        "n2",
+        "Vozinha pode acertar com clube do Marrocos após ser anunciado pelo Colo Colo",
+        "https://placar.com.br/futebol-internacional/vozinha-pode-acertar-com-clube-do-marrocos-apos-ser-anunciado-pelo-colo-colo",
+      ),
+      makeNews(
+        "n3",
+        "Cucurella empresta medalha da Copa do Mundo para carteiro",
+        "https://placar.com.br/futebol-internacional/cucurella-empresta-medalha-da-copa-do-mundo-para-carteiro",
+      ),
+      makeNews(
+        "n4",
+        "21 anos e 1,94 m: Carlos Espí chega ao Real Madrid para disputar vaga com Endrick",
+        "https://placar.com.br/futebol-internacional/21-anos-e-194-m-carlos-espi-chega-ao-real-madrid-para-disputar-vaga-com-endrick",
+      ),
+      makeNews(
+        "n5",
+        "Real Madrid anuncia venda de concorrente de Endrick; veja detalhes",
+        "https://www.band.com.br/esportes/real-madrid-anuncia-venda-de-concorrente-de-endrick-veja-detalhes-202608031727",
+      ),
+      makeNews("n6", "Seleção Brasileira vence amistoso"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("O que se sabe sobre o estado de saúde de Kléberson");
+    expect(titles).not.toContain("Vozinha pode acertar com clube do Marrocos após ser anunciado pelo Colo Colo");
+    expect(titles).not.toContain("Cucurella empresta medalha da Copa do Mundo para carteiro");
+    expect(titles).not.toContain("21 anos e 1,94 m: Carlos Espí chega ao Real Madrid para disputar vaga com Endrick");
+    expect(titles).not.toContain("Real Madrid anuncia venda de concorrente de Endrick; veja detalhes");
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+  });
+
+  it("keeps a Seleção player as the subject in international club news", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      makeNews(
+        "n1",
+        "Endrick é monitorado pela Roma, que estuda empréstimo do brasileiro",
+        "https://placar.com.br/futebol-internacional/endrick-e-monitorado-pela-roma-que-estuda-emprestimo-do-brasileiro",
+      ),
+      makeNews("n2", "Seleção Brasileira joga amistoso em setembro"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).toContain("Endrick é monitorado pela Roma, que estuda empréstimo do brasileiro");
+    expect(titles).toContain("Seleção Brasileira joga amistoso em setembro");
+  });
+
+  it("keeps strong Seleção context even on futebol-internacional URLs (no blanket URL block)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      makeNews(
+        "n1",
+        "Seleção Brasileira define preparação para as Eliminatórias",
+        "https://placar.com.br/futebol-internacional/selecao-brasileira-define-preparacao-para-eliminatorias",
+      ),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).toContain("Seleção Brasileira define preparação para as Eliminatórias");
+  });
 });
