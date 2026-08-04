@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 04/08/2026 (filtro de relevância em camadas no Researcher; 5 notícias off-context de 03/08 bloqueadas; cleanup de capítulos históricos com conteúdo de outras seleções)
+**Última atualização:** 04/08/2026 (filtro de relevância em camadas no Researcher; jogador da Seleção como foco mantém notícias de clube — Vini/Endrick; 5 notícias off-context de 03/08 removidas; resumo do dia reescrito)
 
 ---
 
@@ -101,6 +101,8 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Filtro de Relevância em Camadas** | ✅ Concluído |
 | **Blocklist Off-Context 03/08** | ✅ Concluído |
 | **Limpeza de Conteúdo Off-Context** | ✅ Concluído |
+| **Consistência Foco no Jogador** | ✅ Concluído |
+| **Resumo do Dia 03/08** | ✅ Concluído |
 
 ---
 
@@ -207,6 +209,8 @@ novo-ciclo/
 * ✅ 5 URLs off-context de 03/08 adicionadas ao `news-blocklist.json` (Kléberson/saúde, Vozinha/Marrocos, Cucurella/medalha, Carlos Espí vs Endrick, Real Madrid vende concorrente de Endrick)
 * ✅ `cleanup-chapters` reaplicado: capítulos 16, 17, 18, 19, 20, 23 e 29 de julho limpos de conteúdo de outras seleções na Copa 2026 (Ferran Torres, Cucurella, Messi, Enzo Fernandez, Iniesta, Copa 2026 records etc.)
 * ✅ Testes de regressão adicionados em `src/tests/agents/researcher.test.ts` (5 casos off-context excluídos, Endrick/Roma mantido, contexto forte mantido em URL `/futebol-internacional/`)
+* ✅ Ajuste de consistência: jogador atual da Seleção como **foco** mantém notícia de clube estrangeiro (Vini Jr. → Arsenal/Real Madrid, Endrick → Roma); veto de clube/URL internacional só derruba quando o jogador é secundário ("concorrente de", "disputar vaga com") — padrão cego `/futebol/futebol-internacional/` do ge removido
+* ✅ Capítulo 03/08 restaurado e re-limpo: 5 off-context removidos, Vini Jr. e Endrick mantidos; `resumo` do dia e parágrafo do corpo reescritos (removida menção ao Kléberson)
 
 ## Próxima Iteração — Prioridade Alta
 

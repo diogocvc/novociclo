@@ -104,7 +104,6 @@ const EXCLUDED_KEYWORDS = [
 const EXCLUDED_URL_PATTERNS = [
   "/volei/", "/basquete/", "/handebol/", "/tenis/",
   "/fisiculturismo/",
-  "/futebol/futebol-internacional/",
   "/kings-league/", "/esports/", "/gaming/",
   "/ginastica-ritmica/", "/ginastica-artistica/", "/ginastica/",
   "/atletismo/", "/natacao/", "/surfe/", "/skate/",
@@ -249,12 +248,18 @@ function titleStartsWithSelecaoName(title: string): boolean {
 function hasOffTopicContext(title: string, resumo: string, url: string): boolean {
   const text = buildText(title, resumo);
   const urlLower = url.toLowerCase();
+  const titleLower = title.toLowerCase();
+
+  const temJogadorSelecao = SELEÇÃO_NAMES.some((n) => titleLower.includes(n));
+  const temPosicionamentoSecundario = SECONDARY_POSITIONING.some((p) => text.includes(p));
+  const jogadorPrincipal = temJogadorSelecao && !temPosicionamentoSecundario;
+
+  if (jogadorPrincipal) return false;
 
   const hasForeignClub = FOREIGN_CLUBS.some((c) => text.includes(c));
-  const hasSecondaryPositioning = SECONDARY_POSITIONING.some((p) => text.includes(p));
   const internationalUrl = urlLower.includes("/futebol-internacional/");
 
-  return hasForeignClub || hasSecondaryPositioning || internationalUrl;
+  return hasForeignClub || temPosicionamentoSecundario || internationalUrl;
 }
 
 function calculateScore(title: string, resumo: string): { score: number; matchedGroups: number } {

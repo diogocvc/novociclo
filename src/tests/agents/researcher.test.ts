@@ -317,6 +317,29 @@ describe("ResearcherAgent", () => {
     expect(titles).toContain("Seleção Brasileira joga amistoso em setembro");
   });
 
+  it("keeps club news when a Seleção player is the main subject (Vini Jr.)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      makeNews(
+        "n1",
+        "Arteta conversou com Vini Jr. para levá-lo ao Arsenal, diz jornal",
+        "https://placar.com.br/futebol-internacional/arteta-conversa-com-vini-jr-para-leva-lo-ao-arsenal",
+      ),
+      makeNews(
+        "n2",
+        "Com futuro indefinido, Vini Jr. se reapresenta ao Real Madrid; veja fotos",
+        "https://www.band.com.br/esportes/com-futuro-indefinido-vini-jr-se-reapresenta-ao-real-madrid",
+      ),
+      makeNews("n3", "Seleção Brasileira vence amistoso"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).toContain("Arteta conversou com Vini Jr. para levá-lo ao Arsenal, diz jornal");
+    expect(titles).toContain("Com futuro indefinido, Vini Jr. se reapresenta ao Real Madrid; veja fotos");
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+  });
+
   it("keeps strong Seleção context even on futebol-internacional URLs (no blanket URL block)", async () => {
     mockFetchAllRss.mockResolvedValueOnce([
       makeNews(
