@@ -1,0 +1,64 @@
+name: Daily Watchdog
+on:
+  schedule:
+    - cron: "30 23 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verificar capítulo do dia
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          YEAR=$(date -u +%Y)
+          MONTH=$(date -u +%m)
+          DAY=$(date -u +%d)
+          FILE="content/$YEAR/$MONTH/$DAY.mdx"
+          echo "Verificando $FILE..."
+          if [ -f "$FILE" ]; then
+            echo "Capítulo $YEAR-$MONTH-$DAY já publicado."
+            exit 0
+          fi
+          echo "Capítulo $YEAR-$MONTH-$DAY não encontrado."
+
+          TODAY=$(date -u +%Y-%m-%d)
+          LAST=$(gh api "repos/${{ github.repository }}/actions/workflows/daily.yml/runs?per_page=1" --jq '.workflow_runs[0]')
+          CREATED=$(echo "$LAST" | jq -r '.created_at')
+          CONCLUSION=$(echo "$LAST" | jq -r '.conclusion')
+          STATUS=$(echo "$LAST" | jq -r '.status')
+          echo "Última execução do daily.yml: $CREATED status=$STATUS conclusion=$CONCLUSION"
+
+          if [[ "$CREATED" == "$TODAY"* ]] && [ "$STATUS" = "completed" ] && [ "$CONCLUSION" = "success" ]; then
+            echo "Pipeline diário rodou hoje com sucesso (caso legítimo sem notícias). Nada a fazer."
+            exit 0
+          fi
+
+          echo "missing=1" >> "$GITHUB_ENV"
+
+      - name: Re-disparar pipeline diário
+        if: env.missing == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run daily.yml --repo "${{ github.repository }}"
+          echo "Daily Pipeline re-disparado."
+
+      - name: Notificar Discord
+        if: env.missing == '1'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            curl -s -H "Content-Type: application/json" \
+              -d '{"content":"⚠️ Watchdog: o capítulo de hoje não foi publicado e o Daily Pipeline foi re-disparado."}' \
+              "$DISCORD_WEBHOOK_URL"
+          fi
