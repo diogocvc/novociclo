@@ -231,6 +231,7 @@ novo-ciclo/
   * **Veto de ex-jogador sem relação direta** — título cita ex-jogador e não tem contexto direto da Seleção (frase forte ou jogador atual Vini/Endrick/Rodrygo) ⇒ exclui; menção incidental de "seleção brasileira" no resumo não resgata (corrige as 3 polêmicas de Neymar; "Neymar é convocado" mantido)
   * **Listas/rankings como veto absoluto** — `ranking dos jogadores mais caros`, `jogadores mais caros`, `veja o ranking` ampliam `ALL_TIME_LIST_PHRASES` e o veto passa a rodar **antes** de `hasStrongSelecaoContext` (corrige Luiz Henrique/Flamengo)
 * ✅ Testes de regressão: 4 casos de 05/08 excluídos, "Neymar é convocado" e "Vini Jr. renova" mantidos (97 testes no total, lint e typecheck limpos)
+* ✅ Deploy re-disparado: o webhook do Vercel não disparou no push do fix de 05/08 (efd9b99); commit de re-trigger necessário para publicar o capítulo limpo
 
 ## Decisões editoriais (06/08/2026)
 
