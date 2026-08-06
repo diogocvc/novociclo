@@ -16,7 +16,7 @@ const POSITIVE_GROUPS: Group[] = [
     weight: 3,
     keywords: [
       "seleção brasileira", "selecao brasileira",
-      "neymar", "ancelotti", "vinicius jr", "vinicius junior",
+      "ancelotti", "vinicius jr", "vinicius junior",
       "rodrygo", "endrick", "vini jr", "seleção masculina",
     ],
   },
@@ -156,7 +156,6 @@ const SELEÇÃO_STRONG_PHRASES = [
 ];
 
 const SELEÇÃO_NAMES = [
-  "neymar",
   "vinicius jr", "vinicius junior", "vini jr",
   "rodrygo", "endrick",
 ];
@@ -200,9 +199,13 @@ const ALL_TIME_LIST_PHRASES = [
   "melhores goleiros da história",
   "melhores jogadores da história",
   "ranking dos maiores da história",
+  "ranking dos jogadores mais caros",
+  "jogadores mais caros",
+  "veja o ranking",
 ];
 
 const FORMER_PLAYERS = [
+  "neymar",
   "roberto carlos",
   "ronaldo", "ronaldinho",
   "kaká", "kaka",
@@ -274,6 +277,16 @@ function hasFormerPlayerLegacy(title: string, resumo: string): boolean {
   if (FORMER_PLAYERS.some((p) => t.startsWith(p))) return true;
   const text = buildText(title, resumo);
   return NOSTALGIA_KEYWORDS.some((k) => text.includes(k));
+}
+
+function hasFormerPlayerOffContext(title: string): boolean {
+  const t = title.toLowerCase().trim();
+  const hasFormerPlayer = FORMER_PLAYERS.some((p) => t.includes(p));
+  if (!hasFormerPlayer) return false;
+  const hasDirectSelecao =
+    SELEÇÃO_STRONG_PHRASES.some((p) => t.includes(p)) ||
+    SELEÇÃO_NAMES.some((n) => t.includes(n));
+  return !hasDirectSelecao;
 }
 
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
@@ -358,9 +371,11 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   const hasFormerPlayerHealth = FORMER_PLAYER_OR_HEALTH.some((m) => text.includes(m));
   if (hasFormerPlayerHealth) return false;
 
+  if (hasFormerPlayerOffContext(title)) return false;
+  if (hasAllTimeListOpinion(title, resumo ?? "")) return false;
+
   if (hasStrongSelecaoContext(text)) return true;
 
-  if (hasAllTimeListOpinion(title, resumo ?? "")) return false;
   if (hasFormerPlayerLegacy(title, resumo ?? "")) return false;
 
   if (titleStartsWithSelecaoName(title)) return true;

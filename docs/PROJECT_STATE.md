@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 04/08/2026 (capítulo 04/08 limpo de 5 notícias off-context; filtro ampliado: outras competições da Fifa, família/entretenimento, listas históricas, ex-jogadores/legado e sujeito em oração relativa; ADR-010 no DECISIONS.md)
+**Última atualização:** 06/08/2026 (capítulo 05/08 limpo de 4 notícias off-context; Neymar tratado como ex-jogador da Seleção; listas/rankings como veto absoluto; ADR-011 no DECISIONS.md)
 
 ---
 
@@ -105,6 +105,8 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Resumo do Dia 03/08** | ✅ Concluído |
 | **Limpeza Off-Context 04/08** | ✅ Concluído |
 | **Filtro de Relevância 04/08 (ADR-010)** | ✅ Concluído |
+| **Limpeza Off-Context 05/08** | ✅ Concluído |
+| **Neymar como Ex-Jogador + Listas/Rankings (ADR-011)** | ✅ Concluído |
 
 ---
 
@@ -222,6 +224,20 @@ novo-ciclo/
   * **Veto ex-jogadores/legado** — título iniciando com ex-jogador (Roberto Carlos, Ronaldo, Ronaldinho, Kaká, Pelé, Zico, Sócrates…) ou nostalgia (`torciam`, `quando crianças`, `time do coração`) ⇒ exclui (corrige Roberto Carlos)
   * **Sujeito em oração relativa** — jogador após `que …` no título deixa de ser "foco" ("goleiro da Noruega que discutiu com Neymar" excluído; "Arteta conversou com Vini Jr." e "Endrick é monitorado pela Roma" mantidos)
 * ✅ Testes de regressão: 5 casos de 04/08 excluídos (96 testes no total, lint e typecheck limpos)
+* ✅ Capítulo 05/08 limpo de 4 notícias off-context (Polêmicas de Neymar, Comportamento de Neymar na imprensa europeia, Beijo para torcedora/xingamentos contra o Remo e Luiz Henrique no Flamengo/ranking dos mais caros); destaque e demais notícias mantidos; `resumo`/`corpo` já não citavam as removidas
+* ✅ 4 URLs de 05/08 adicionadas ao `news-blocklist.json` (URL da Placar sem query string para casar qualquer variante)
+* ✅ Filtro do Researcher refinado (ADR-011):
+  * **Neymar tratado como ex-jogador** — removido do grupo SELEÇÃO e de `SELEÇÃO_NAMES`, movido para `FORMER_PLAYERS` (Neymar se aposentou da Seleção após a Copa 2026)
+  * **Veto de ex-jogador sem relação direta** — título cita ex-jogador e não tem contexto direto da Seleção (frase forte ou jogador atual Vini/Endrick/Rodrygo) ⇒ exclui; menção incidental de "seleção brasileira" no resumo não resgata (corrige as 3 polêmicas de Neymar; "Neymar é convocado" mantido)
+  * **Listas/rankings como veto absoluto** — `ranking dos jogadores mais caros`, `jogadores mais caros`, `veja o ranking` ampliam `ALL_TIME_LIST_PHRASES` e o veto passa a rodar **antes** de `hasStrongSelecaoContext` (corrige Luiz Henrique/Flamengo)
+* ✅ Testes de regressão: 4 casos de 05/08 excluídos, "Neymar é convocado" e "Vini Jr. renova" mantidos (97 testes no total, lint e typecheck limpos)
+
+## Decisões editoriais (06/08/2026)
+
+Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-011** (docs/DECISIONS.md):
+
+* **DE-7 — Ex-jogador sem relação direta**: conteúdo de ex-jogador da Seleção (incluindo Neymar, aposentado após a Copa 2026) é off-context a menos que o título tenha relação direta com a Seleção (frase forte como "convocação" ou jogador atual no foco). Menção incidental de "seleção brasileira" no resumo não resgata.
+* **DE-8 — Listas/rankings como veto absoluto**: listicles e rankings de mercado ("jogadores mais caros", "maiores da história") são excluídos antes do contexto forte — menção a "seleção brasileira" no resumo não os salva.
 
 ## Decisões editoriais (04/08/2026)
 

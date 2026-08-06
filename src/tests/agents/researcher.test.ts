@@ -45,7 +45,7 @@ describe("ResearcherAgent", () => {
     mockFetchAllRss.mockResolvedValueOnce([
       makeNews("n1", "Seleção Brasileira vence amistoso"),
       makeNews("n2", "CBF traça objetivos da Seleção até 2030"),
-      makeNews("n3", "Neymar volta aos treinos"),
+      makeNews("n3", "Vini Jr. inicia pré-temporada no Real Madrid"),
     ]);
 
     const result = await agent.execute({ date: new Date("2026-07-15") });
@@ -412,5 +412,59 @@ describe("ResearcherAgent", () => {
     expect(titles).not.toContain("Fifa lança plano de direitos humanos e sustentabilidade para Copa do Mundo Feminina no Brasil");
     expect(titles).not.toContain('Goleiro da Noruega que "discutiu" com Neymar assina com gigante alemão');
     expect(titles).toContain("Seleção Brasileira vence amistoso");
+  });
+
+  it("excludes today's off-context news (05/08): Neymar retired from the Seleção and club-transfer rankings", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "Polêmicas de Neymar: astro do Santos acumula 'tretas' em 2026; veja lista",
+          "https://www.band.com.br/esportes/robinho-jr-goleiro-da-noruega-remo-poker-e-mais-as-polemicas-de-neymar-em-2026-202608051127",
+        ),
+        resumo_original:
+          "De atritos no Santos a atritos na Seleção Brasileira, relembre os episódios marcantes do camisa 10",
+      },
+      {
+        ...makeNews(
+          "n2",
+          "Comportamento de Neymar repercute na imprensa europeia: 'Fora de controle'",
+          "https://www.band.com.br/esportes/imprensa-internacional-repercute-comportamento-de-neymar-e-ve-jogador-fora-de-controle-202608051100",
+        ),
+        resumo_original:
+          "Atitude do atacante na zona mista do Mangueirão ganha destaque nos principais jornais do Velho Continente",
+      },
+      {
+        ...makeNews(
+          "n3",
+          "Beijo para torcedora e xingamentos: veja polêmicas de Neymar contra o Remo",
+          "https://www.band.com.br/esportes/beijo-para-torcedora-e-xingamentos-veja-polemicas-de-neymar-contra-o-remo-202608051031",
+        ),
+        resumo_original: "Meia santistas se envolveu em discussão com membros do clube paraense",
+      },
+      {
+        ...makeNews(
+          "n4",
+          "Luiz Henrique no Flamengo? Veja o ranking dos jogadores mais caros Brasil",
+          "https://placar.com.br/mercado-da-bola/luiz-henrique-no-flamengo-veja-o-ranking-dos-jogadores-mais-caros-brasil",
+        ),
+        resumo_original:
+          "Após desistir de Almada, Rubro-Negro tenta avançar em acordo por atacante do Zenit e da seleção brasileira",
+      },
+      makeNews("n5", "Seleção Brasileira vence amistoso"),
+      makeNews("n6", "Neymar é convocado"),
+      makeNews("n7", "Vini Jr. renova com o Real Madrid até 2031"),
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("Polêmicas de Neymar: astro do Santos acumula 'tretas' em 2026; veja lista");
+    expect(titles).not.toContain("Comportamento de Neymar repercute na imprensa europeia: 'Fora de controle'");
+    expect(titles).not.toContain("Beijo para torcedora e xingamentos: veja polêmicas de Neymar contra o Remo");
+    expect(titles).not.toContain("Luiz Henrique no Flamengo? Veja o ranking dos jogadores mais caros Brasil");
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+    expect(titles).toContain("Neymar é convocado");
+    expect(titles).toContain("Vini Jr. renova com o Real Madrid até 2031");
   });
 });

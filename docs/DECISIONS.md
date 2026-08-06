@@ -428,6 +428,44 @@ Estender o filtro em camadas com cinco regras adicionais:
 
 ---
 
+# ADR-011
+
+## Título
+
+Neymar tratado como ex-jogador da Seleção e listas/rankings como veto absoluto no filtro do Researcher.
+
+### Status
+
+Aceita
+
+### Data
+
+06/08/2026
+
+### Contexto
+
+Quatro notícias off-context entraram no capítulo de 05/08: três sobre polêmicas/comportamento pessoal de Neymar (beijo para torcedora, xingamentos, "tretas" e repercussão na imprensa europeia) e uma listicle de transferência de clube brasileiro com ranking dos jogadores mais caros ("Luiz Henrique no Flamengo?"). Neymar se aposentou da Seleção Brasileira após a Copa do Mundo de 2026, mas o filtro ainda o tratava como jogador atual (`SELEÇÃO_NAMES` + grupo SELEÇÃO com score 3), o que o tornava "foco" da notícia e impedia o veto off-context. A ADR-010 havia rejeitado mover Neymar para ex-jogadores sob a premissa de ele ser jogador atual — premissa que mudou.
+
+### Decisão
+
+* **Neymar como ex-jogador**: remover `neymar` do grupo SELEÇÃO e de `SELEÇÃO_NAMES`; adicionar a `FORMER_PLAYERS`.
+* **Veto de ex-jogador sem relação direta** (antes do contexto forte): nova regra `hasFormerPlayerOffContext` — se o título cita ex-jogador e não contém contexto direto da Seleção (frase forte como `convocação`/`seleção brasileira`/`ancelotti` ou jogador atual Vini/Endrick/Rodrygo), exclui. Menção incidental de "seleção brasileira" no resumo não resgata conteúdo de ex-jogador. Ex.: "Polêmicas de Neymar", "Comportamento de Neymar", "Beijo para torcedora" excluídos; "Neymar é convocado" e "Seleção homenageia Neymar" mantidos.
+* **Listas/rankings como veto absoluto**: ampliar `ALL_TIME_LIST_PHRASES` com `ranking dos jogadores mais caros`, `jogadores mais caros`, `veja o ranking` e mover o veto de listas para **antes** de `hasStrongSelecaoContext`, corrigindo o short-circuit em que menção a "seleção brasileira" no resumo deixava a listicle passar.
+
+### Alternativas consideradas
+
+* Vetos específicos de "polêmica"/"comportamento" sem tratar Neymar como ex-jogador — rejeitado: abordagem pontual; a aposentadoria de Neymar é a causa raiz e a regra de ex-jogador cobre o padrão genericamente.
+* Manter listas/rankings como veto relativo — rejeitado: menção incidental de "seleção brasileira" no resumo (ex.: atacante "da seleção brasileira") fazia `hasStrongSelecaoContext` retornar antes do veto.
+
+### Consequências
+
+* Conteúdo de comportamento/entretenimento de ex-jogadores fora do escopo editorial não entra mais.
+* Listicles/rankings de mercado (jogadores mais caros, maiores da história) excluídos mesmo com menção incidental à Seleção.
+* Jogadores atuais (Vini Jr., Endrick, Rodrygo) seguem como foco de notícias de clube, conforme ADR-009.
+* Ao remover notícias de um capítulo já gerado, o resumo e o corpo devem ser reescritos para a listagem final (mantém DE-6).
+
+---
+
 # Processo para novas decisões
 
 Uma nova ADR deve ser criada quando houver mudanças em:
