@@ -467,4 +467,76 @@ describe("ResearcherAgent", () => {
     expect(titles).toContain("Neymar é convocado");
     expect(titles).toContain("Vini Jr. renova com o Real Madrid até 2031");
   });
+
+  it("excludes today's off-context news (06/08): Brazilian club focus, foreign star and promo/media announcement", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "Após ação na Justiça, Mayke tem rescisão com o Santos publicada no BID",
+          "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/06/apos-acao-na-justica-mayke-tem-rescisao-com-o-santos-publicada-no-bid.ghtm",
+        ),
+        resumo_original:
+          "O lateral-direito Mayke não é mais jogador do Santos. Nesta quinta-feira (6), a rescisão contratual do atleta foi publicada no Boletim Informativo Diário (BID) da CBF, deixando-o livre no mercado para assinar com qualquer outra equipe",
+      },
+      {
+        ...makeNews(
+          "n2",
+          "Mayke rescinde contrato com o Santos e fica livre no mercado; veja detalhes",
+          "https://www.band.com.br/esportes/mayke-rescinde-contrato-com-o-santos-e-fica-livre-no-mercado-veja-detalhes-202608061919",
+        ),
+        resumo_original: "Rescisão do lateral-direito foi publicada no site da CBF",
+      },
+      {
+        ...makeNews(
+          "n3",
+          "Messi brilha em vitória do Inter Miami após vice na Copa do Mundo",
+          "https://www.band.com.br/esportes/jornada-de-messi-para-esquecer-o-vice-da-copa-tem-show-com-gols-e-assistencia-pelo-inter-miami-202608060948",
+        ),
+        resumo_original: "Craque argentino comandou virada contra o San Luís na Leagues Cup",
+      },
+      {
+        ...makeNews(
+          "n4",
+          "PLACAR lança tradicional edição pós-Copa do Mundo de 2026",
+          "https://placar.com.br/copa-do-mundo/placar-lanca-tradicional-edicao-pos-copa-do-mundo-de-2026",
+        ),
+        resumo_original:
+          "Edição de agosto traz um balanço da competição vencida pela Espanha, com estatísticas e a análise do fiasco da seleção brasileira",
+      },
+      {
+        ...makeNews(
+          "n5",
+          "Mercado: Fabinho sem clube, dois anúncios no São Paulo e Real reforçado",
+          "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/08/06/mercado-fabinho-sem-clube-dois-anuncios-no-sao-paulo-e-real-reforcado.ghtm",
+        ),
+        resumo_original:
+          "O mercado da bola foi bastante movimentado nesta quinta-feira com anúncios de reforços no São Paulo, o fim de novelas importantes no Real Madrid e a liberação do meio-campista da seleção brasileira Fabinho, que agora procura um novo clube",
+      },
+      makeNews("n6", "Seleção Brasileira vence amistoso"),
+      makeNews("n7", "Fifa pede desculpas a confederações"),
+      makeNews("n8", "Real Madrid anuncia renovação com Vini Jr"),
+      {
+        ...makeNews(
+          "n9",
+          "Al-Ittihad anuncia saída do volante Fabinho, que jogou a Copa de 2026; jogador está livre",
+        ),
+        resumo_original:
+          "Atleta de 32 anos disputou três partidas pela seleção brasileira no último Mundial",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-07-15") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("Após ação na Justiça, Mayke tem rescisão com o Santos publicada no BID");
+    expect(titles).not.toContain("Mayke rescinde contrato com o Santos e fica livre no mercado; veja detalhes");
+    expect(titles).not.toContain("Messi brilha em vitória do Inter Miami após vice na Copa do Mundo");
+    expect(titles).not.toContain("PLACAR lança tradicional edição pós-Copa do Mundo de 2026");
+    expect(titles).not.toContain("Mercado: Fabinho sem clube, dois anúncios no São Paulo e Real reforçado");
+    expect(titles).toContain("Seleção Brasileira vence amistoso");
+    expect(titles).toContain("Fifa pede desculpas a confederações");
+    expect(titles).toContain("Real Madrid anuncia renovação com Vini Jr");
+    expect(titles).toContain("Al-Ittihad anuncia saída do volante Fabinho, que jogou a Copa de 2026; jogador está livre");
+  });
 });

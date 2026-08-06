@@ -289,6 +289,39 @@ function hasFormerPlayerOffContext(title: string): boolean {
   return !hasDirectSelecao;
 }
 
+function hasBrazilianClubFocusOffContext(title: string): boolean {
+  const t = title.toLowerCase().trim();
+  const temClube = CLUBES_BRASILEIROS.some((c) => t.includes(c));
+  if (!temClube) return false;
+  const temJogadorSelecao = SELEÇÃO_NAMES.some((n) => t.includes(n));
+  const temFraseForte = SELEÇÃO_STRONG_PHRASES.some((p) => t.includes(p));
+  return !temJogadorSelecao && !temFraseForte;
+}
+
+function hasForeignStarOffContext(title: string, resumo: string): boolean {
+  const text = buildText(title, resumo);
+  const t = title.toLowerCase().trim();
+  const hasNationality = OTHER_NATIONALITIES.some((n) => text.includes(n));
+  if (!hasNationality) return false;
+  const hasBrasil =
+    text.includes("brasil") ||
+    text.includes("brasileira") ||
+    text.includes("brasileiro") ||
+    text.includes("brasileiras") ||
+    text.includes("brasileiros");
+  const temSelecaoTitulo = t.includes("seleção") || t.includes("selecao");
+  const temJogadorSelecao = SELEÇÃO_NAMES.some((n) => t.includes(n));
+  const temFraseForte = SELEÇÃO_STRONG_PHRASES.some((p) => t.includes(p));
+  return !hasBrasil && !temSelecaoTitulo && !temJogadorSelecao && !temFraseForte;
+}
+
+function hasPromoAnnouncement(title: string): boolean {
+  const t = title.toLowerCase().trim();
+  const temLanca = t.includes("lança") || t.includes("lanca");
+  if (!temLanca) return false;
+  return t.includes("edição") || t.includes("edicao") || t.includes("revista");
+}
+
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
   const urlLower = url.toLowerCase();
   const fullText = buildText(title, resumo);
@@ -373,6 +406,9 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
 
   if (hasFormerPlayerOffContext(title)) return false;
   if (hasAllTimeListOpinion(title, resumo ?? "")) return false;
+  if (hasPromoAnnouncement(title)) return false;
+  if (hasBrazilianClubFocusOffContext(title)) return false;
+  if (hasForeignStarOffContext(title, resumo ?? "")) return false;
 
   if (hasStrongSelecaoContext(text)) return true;
 

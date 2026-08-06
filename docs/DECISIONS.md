@@ -466,6 +466,47 @@ Quatro notícias off-context entraram no capítulo de 05/08: três sobre polêmi
 
 ---
 
+# ADR-012
+
+## Título
+
+Foco em clube brasileiro, astro estrangeiro e anúncio promocional/midiático como vetos off-context no filtro do Researcher.
+
+### Status
+
+Aceita
+
+### Data
+
+06/08/2026
+
+### Contexto
+
+Cinco notícias off-context entraram no capítulo de 06/08: duas sobre Mayke/Santos (rescisão publicada no BID da CBF), uma sobre Messi/Inter Miami ("vice na Copa do Mundo"), o anúncio da edição pós-Copa da própria revista Placar e um roundup de mercado com foco em clube brasileiro (São Paulo). Menções incidentais de "CBF"/"seleção brasileira" no resumo, o keyword "copa do mundo" (peso 3) alcançando notícia de astro estrangeiro e a ausência de cobertura de promoções midiáticas faziam `isRelevant` aceitar esses itens.
+
+### Decisão
+
+* **Veto de foco em clube brasileiro** (antes do contexto forte): nova regra `hasBrazilianClubFocusOffContext` — se o título cita clube brasileiro (`CLUBES_BRASILEIROS`) e NÃO contém jogador da Seleção no título (`SELEÇÃO_NAMES`) nem frase forte da Seleção no título (`SELEÇÃO_STRONG_PHRASES`), exclui. Menção incidental de "CBF"/"seleção brasileira" no resumo não resgata. Ex.: "Após ação na Justiça, Mayke tem rescisão com o Santos publicada no BID" e "Mercado: Fabinho sem clube, dois anúncios no São Paulo e Real reforçado" excluídos.
+* **Veto de astro estrangeiro** (antes do contexto forte): nova regra `hasForeignStarOffContext` — se o texto contém nacionalidade estrangeira (`OTHER_NATIONALITIES`) e NÃO contém "brasil/brasileir*", nem "seleção"/jogador da Seleção/frase forte no título, exclui. Corrige Messi/Inter Miami. A regra antiga (nacionalidade + "seleção" + sem "brasil") é mantida para notícias de outras seleções.
+* **Veto de anúncio promocional/midiático**: nova regra `hasPromoAnnouncement` — título com "lança"/"lanca" + "edição"/"revista" exclui (produto da própria mídia). Corrige a edição pós-Copa da Placar.
+* As três regras rodam **antes** de `hasStrongSelecaoContext`, seguindo o padrão dos vetoes do ADR-010/011.
+* As 5 URLs foram adicionadas ao `news-blocklist.json`.
+
+### Alternativas consideradas
+
+* Apenas adicionar URLs ao blocklist — rejeitado: corrige o dia, mas não o padrão; novas notícias do mesmo tipo voltariam a entrar.
+* Ampliar `FOREIGN_CLUBS` com Inter Miami — rejeitado: pontual; a regra de astro estrangeiro cobre o padrão genericamente.
+
+### Consequências
+
+* Conteúdo focado em clube brasileiro sem relação direta com a Seleção (rescisões/transferências de clubes) não entra mais, mesmo com menção incidental de CBF no resumo.
+* Notícias sobre astros de outras seleções/ligas estrangeiras ("vice na Copa", desempenho em clubes) excluídas quando não há vínculo com a Seleção no título.
+* Anúncios promocionais de veículos de mídia ficam fora do escopo editorial.
+* Jogadores atuais (Vini Jr., Endrick, Rodrygo) e contexto forte da Seleção no título seguem protegidos (não disparam os novos vetoes).
+* Ao remover notícias de um capítulo já gerado, o resumo e o corpo devem ser reescritos para a listagem final (mantém DE-6).
+
+---
+
 # Processo para novas decisões
 
 Uma nova ADR deve ser criada quando houver mudanças em:

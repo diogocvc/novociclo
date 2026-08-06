@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 06/08/2026 (capítulo 05/08 limpo de 4 notícias off-context; Neymar tratado como ex-jogador da Seleção; listas/rankings como veto absoluto; ADR-011 no DECISIONS.md)
+**Última atualização:** 06/08/2026 (capítulo 06/08 limpo de 5 notícias off-context — foco em clube brasileiro, astro estrangeiro e anúncio promocional; ADR-012 no DECISIONS.md; pipeline diário re-disparado via watchdog)
 
 ---
 
@@ -232,6 +232,14 @@ novo-ciclo/
   * **Listas/rankings como veto absoluto** — `ranking dos jogadores mais caros`, `jogadores mais caros`, `veja o ranking` ampliam `ALL_TIME_LIST_PHRASES` e o veto passa a rodar **antes** de `hasStrongSelecaoContext` (corrige Luiz Henrique/Flamengo)
 * ✅ Testes de regressão: 4 casos de 05/08 excluídos, "Neymar é convocado" e "Vini Jr. renova" mantidos (97 testes no total, lint e typecheck limpos)
 * ✅ Deploy re-disparado: o webhook do Vercel não disparou no push do fix de 05/08 (efd9b99); commit de re-trigger necessário para publicar o capítulo limpo
+* ✅ Capítulo 06/08 limpo de 5 notícias off-context (Mayke/Santos ×2, Messi/Inter Miami, edição pós-Copa da Placar e roundup de mercado com foco no São Paulo); destaque Fabinho e demais notícias (Fifa, Vini Jr.) mantidos; `resumo`/corpo reescritos sem menção a Mayke (DE-6)
+* ✅ 5 URLs de 06/08 adicionadas ao `news-blocklist.json` (URL da Placar sem query string para casar qualquer variante)
+* ✅ Filtro do Researcher refinado (ADR-012):
+  * **Veto de foco em clube brasileiro** — título cita clube brasileiro (`CLUBES_BRASILEIROS`) sem jogador da Seleção nem frase forte da Seleção no título ⇒ exclui; menção incidental de "CBF"/"seleção brasileira" no resumo não resgata (corrige Mayke/Santos e o roundup Mercado/São Paulo)
+  * **Veto de astro estrangeiro** — texto com nacionalidade estrangeira (`OTHER_NATIONALITIES`) sem "brasil/brasileir*", nem "seleção"/jogador da Seleção/frase forte no título ⇒ exclui; regra antiga (nacionalidade + seleção + !brasil) mantida (corrige Messi/Inter Miami)
+  * **Veto de anúncio promocional/midiático** — título com "lança"/"lanca" + "edição"/"revista" ⇒ exclui (corrige edição pós-Copa da Placar)
+* ✅ Testes de regressão: 5 casos de 06/08 excluídos, controles mantidos (98 testes no total, lint e typecheck limpos)
+* ✅ Watchdog instalado (`.github/workflows/watchdog.yml`, cron `30 23 * * *`): verifica se o capítulo do dia existe e re-dispara o `daily.yml` quando o cron foi pulado, com notificação via Discord; não re-dispara em dia sem novidades
 
 ## Decisões editoriais (06/08/2026)
 
@@ -239,6 +247,9 @@ Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-011** (doc
 
 * **DE-7 — Ex-jogador sem relação direta**: conteúdo de ex-jogador da Seleção (incluindo Neymar, aposentado após a Copa 2026) é off-context a menos que o título tenha relação direta com a Seleção (frase forte como "convocação" ou jogador atual no foco). Menção incidental de "seleção brasileira" no resumo não resgata.
 * **DE-8 — Listas/rankings como veto absoluto**: listicles e rankings de mercado ("jogadores mais caros", "maiores da história") são excluídos antes do contexto forte — menção a "seleção brasileira" no resumo não os salva.
+* **DE-9 — Foco em clube brasileiro**: notícia cujo título é focado em clube brasileiro (rescisões, transferências, escalações) sem jogador da Seleção nem frase forte da Seleção no título é off-context, mesmo com menção incidental de "CBF" no resumo.
+* **DE-10 — Astro estrangeiro sem vínculo**: notícia de astro/jogador de outra seleção ou liga estrangeira (ex.: Messi/Inter Miami) sem "brasil/brasileir*" e sem vínculo com a Seleção no título é off-context.
+* **DE-11 — Anúncio promocional/midiático**: anúncio de produto do próprio veículo de mídia ("lança edição/revista") é off-context.
 
 ## Decisões editoriais (04/08/2026)
 
