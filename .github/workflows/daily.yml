@@ -3,6 +3,12 @@ on:
   schedule:
     - cron: "0 21 * * *"
   workflow_dispatch:
+    inputs:
+      date:
+        description: "Data-alvo do capítulo (YYYY-MM-DD). Vazio = data atual."
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -17,24 +23,47 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run pipeline
+
+      - name: Run pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo-red.vercel.app' }}
           NEXT_PUBLIC_CYCLE_START_DATE: ${{ vars.NEXT_PUBLIC_CYCLE_START_DATE || '2026-07-05T00:00:00-03:00' }}
           NEXT_PUBLIC_WORLD_CUP_DATE: ${{ vars.NEXT_PUBLIC_WORLD_CUP_DATE || '2030-06-11T00:00:00-03:00' }}
           NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID || 'G-T9J81CXJ2E' }}
-      - if: success()
+          TARGET_DATE: ${{ inputs.date }}
+        run: |
+          if [ -n "$TARGET_DATE" ]; then
+            echo "Data-alvo informada via workflow_dispatch: $TARGET_DATE"
+            npm run pipeline "$TARGET_DATE"
+          else
+            npm run pipeline
+          fi
+
+      - name: Commit and push
+        id: push
+        if: success()
+        env:
+          TARGET_DATE: ${{ inputs.date }}
         run: |
           git config user.name "Novo Ciclo Bot"
           git config user.email "bot@novociclo.app"
           git add content/ public/rss.xml public/sitemap.xml
-          git commit -m "chore: daily pipeline $(date +%Y-%m-%d)" || echo "No changes to commit"
-          git pull --rebase
-          git push
+          LABEL="${TARGET_DATE:-$(date +%Y-%m-%d)}"
+          if git commit -m "chore: daily pipeline $LABEL"; then
+            git pull --rebase
+            git push
+            NEW_SHA=$(git rev-parse HEAD)
+            echo "NEW_SHA=$NEW_SHA" >> "$GITHUB_ENV"
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+            echo "Novo commit: $NEW_SHA"
+          else
+            echo "No changes to commit"
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Wait for Vercel deployment
-        if: success()
+        if: steps.push.outputs.committed == 'true'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
@@ -68,7 +97,7 @@ jobs:
         run: |
           STATUS="${{ job.status }}"
           DATE="$(date -u '+%Y-%m-%d %H:%M UTC')"
-          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHA="${NEW_SHA:-${{ github.sha }}}"
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/$COMMIT_SHA"
           SITE_URL="${{ vars.NEXT_PUBLIC_SITE_URL || 'https://novociclo-red.vercel.app' }}"
           DEPLOY_URL="${{ env.DEPLOYMENT_URL }}"

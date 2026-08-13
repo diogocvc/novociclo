@@ -18,39 +18,42 @@ jobs:
         id: check
         env:
           GH_TOKEN: ${{ github.token }}
+          TZ: America/Sao_Paulo
         run: |
-          YEAR=$(date -u +%Y)
-          MONTH=$(date -u +%m)
-          DAY=$(date -u +%d)
+          YEAR=$(date +%Y)
+          MONTH=$(date +%m)
+          DAY=$(date +%d)
+          TODAY="$YEAR-$MONTH-$DAY"
           FILE="content/$YEAR/$MONTH/$DAY.mdx"
-          echo "Verificando $FILE..."
+          echo "Verificando $FILE (data-alvo $TODAY em horário de Brasília)..."
           if [ -f "$FILE" ]; then
             echo "Capítulo $YEAR-$MONTH-$DAY já publicado."
             exit 0
           fi
           echo "Capítulo $YEAR-$MONTH-$DAY não encontrado."
 
-          TODAY=$(date -u +%Y-%m-%d)
           LAST=$(gh api "repos/${{ github.repository }}/actions/workflows/daily.yml/runs?per_page=1" --jq '.workflow_runs[0]')
           CREATED=$(echo "$LAST" | jq -r '.created_at')
+          CREATED_BRT=$(TZ=America/Sao_Paulo date -d "$CREATED" +%Y-%m-%d)
           CONCLUSION=$(echo "$LAST" | jq -r '.conclusion')
           STATUS=$(echo "$LAST" | jq -r '.status')
-          echo "Última execução do daily.yml: $CREATED status=$STATUS conclusion=$CONCLUSION"
+          echo "Última execução do daily.yml: $CREATED (BRT: $CREATED_BRT) status=$STATUS conclusion=$CONCLUSION"
 
-          if [[ "$CREATED" == "$TODAY"* ]] && [ "$STATUS" = "completed" ] && [ "$CONCLUSION" = "success" ]; then
-            echo "Pipeline diário rodou hoje com sucesso (caso legítimo sem notícias). Nada a fazer."
+          if [ "$CREATED_BRT" = "$TODAY" ] && [ "$STATUS" = "completed" ] && [ "$CONCLUSION" = "success" ]; then
+            echo "Pipeline diário rodou hoje (BRT) com sucesso (caso legítimo sem notícias). Nada a fazer."
             exit 0
           fi
 
           echo "missing=1" >> "$GITHUB_ENV"
+          echo "target_date=$TODAY" >> "$GITHUB_ENV"
 
       - name: Re-disparar pipeline diário
         if: env.missing == '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run daily.yml --repo "${{ github.repository }}"
-          echo "Daily Pipeline re-disparado."
+          gh workflow run daily.yml --repo "${{ github.repository }}" -f date="${{ env.target_date }}"
+          echo "Daily Pipeline re-disparado para o dia ${{ env.target_date }}."
 
       - name: Notificar Discord
         if: env.missing == '1'
@@ -59,6 +62,6 @@ jobs:
         run: |
           if [ -n "$DISCORD_WEBHOOK_URL" ]; then
             curl -s -H "Content-Type: application/json" \
-              -d '{"content":"⚠️ Watchdog: o capítulo de hoje não foi publicado e o Daily Pipeline foi re-disparado."}' \
+              -d '{"content":"⚠️ Watchdog: o capítulo de hoje (${{ env.target_date }}) não foi publicado e o Daily Pipeline foi re-disparado."}' \
               "$DISCORD_WEBHOOK_URL"
           fi

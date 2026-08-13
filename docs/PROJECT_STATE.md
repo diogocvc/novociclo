@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 06/08/2026 (capítulo 06/08 limpo de 5 notícias off-context — foco em clube brasileiro, astro estrangeiro e anúncio promocional; ADR-012 no DECISIONS.md; pipeline diário re-disparado via watchdog)
+**Última atualização:** 13/08/2026 (falso positivo do Watchdog investigado e corrigido: capítulo prematuro 08/13 removido; watchdog com fuso America/Sao_Paulo e data-alvo explícita; daily.yml com input `date` e notificação com commit real)
 
 ---
 
@@ -107,6 +107,12 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Filtro de Relevância 04/08 (ADR-010)** | ✅ Concluído |
 | **Limpeza Off-Context 05/08** | ✅ Concluído |
 | **Neymar como Ex-Jogador + Listas/Rankings (ADR-011)** | ✅ Concluído |
+| **Dataset Histórico (extração) + ANC/DNC** | ✅ Concluído |
+| **Auditoria dos Dados** | ✅ Concluído |
+| **Refinamento de Temas DNC (4 clusters)** | ✅ Concluído |
+| **Correção Watchdog (fuso BRT + data-alvo explícita)** | ✅ Concluído |
+| **Remoção do Capítulo Prematuro 08/13** | ✅ Concluído |
+| **Daily Pipeline: input date + Commit Real na notificação** | ✅ Concluído |
 
 ---
 
@@ -142,6 +148,8 @@ novo-ciclo/
 │   └── seo/
 ├── automation/             → daily-pipeline.ts
 ├── scripts/                → create-post, import-rss, generate-sitemap, backup, cleanup-chapters, backfill-news, fetch-thumbnails, block-news
+│                            → extract_dataset.py (dataset histórico), refine_themes.py (temas DNC)
+├── data/                   → dataset.json, daily_posts.csv, reference_news.csv, themes_dnc.json
 ├── .github/workflows/      → test.yml, daily.yml
 └── vercel.json
 ```
@@ -240,6 +248,31 @@ novo-ciclo/
   * **Veto de anúncio promocional/midiático** — título com "lança"/"lanca" + "edição"/"revista" ⇒ exclui (corrige edição pós-Copa da Placar)
 * ✅ Testes de regressão: 5 casos de 06/08 excluídos, controles mantidos (98 testes no total, lint e typecheck limpos)
 * ✅ Watchdog instalado (`.github/workflows/watchdog.yml`, cron `30 23 * * *`): verifica se o capítulo do dia existe e re-dispara o `daily.yml` quando o cron foi pulado, com notificação via Discord; não re-dispara em dia sem novidades
+* ✅ Repositório local atualizado (fast-forward `db4625c` → `279650a`): trouxe os capítulos `08/07`–`08/11` (os únicos dias ausentes que existiam no remote)
+* ✅ Dataset histórico pronto para o "Novo Ciclo Wrapped" (`scripts/extract_dataset.py`, idempotente):
+  * ✅ `data/dataset.json` — 33 posts (06/07–11/08) com frontmatter completo + body; classificação **ANC** (6 posts: 05–10/07) e **DNC** (27 posts: 11/07 em diante) apenas adicionando o campo `period`, sem alterar dados
+  * ✅ `data/daily_posts.csv` — 33 linhas (uma por post), incluindo listas/objetos JSON-encoded e `body`
+  * ✅ `data/reference_news.csv` — 148 linhas (31 destaques + 117 referências), com `role` e `reference_index`
+  * ✅ Parsing YAML via `node + js-yaml` (sem PyYAML no ambiente), fidelidade total aos scalars, datas preservadas como texto original
+  * ✅ 13 fontes (ranking: Band Esportes 53, ge 35, Placar 32, UOL Esporte 16…)
+  * ✅ Auditoria documentada: campos obrigatórios/opcionais, 7 inconsistências estruturais, 5 datas sem arquivo (07/21, 07/26, 07/31, 08/01, 08/02 — sendo os três últimos off-topic removidos no remote)
+* ✅ Refinamento temático do DNC (`scripts/refine_themes.py` → `data/themes_dnc.json`): 4 grandes clusters validados por TF-IDF + termos-semente (129 notícias):
+  * ✅ **F** Crise FIFA / caso Infantino — 42 notícias, 10 posts (pico 08/03)
+  * ✅ **M** Mercado da bola — 45 notícias, 12 posts (pico 08/10)
+  * ✅ **S** Reconstrução da Seleção / era Ancelotti-CBF — 16 notícias, 12 posts (11–15/07 e 28–30/07)
+  * ✅ **C** Pós-Copa imediato / final e legado — 21 notícias, 11 posts (16–27/07, pico 19/07)
+  * ✅ Matriz de sobreposição (17/129 com 2+ temas; M↔S=8 e M↔C=7; F é o mais isolado)
+  * ✅ Linha do tempo do tema dominante por data registrada
+* ✅ **Incidente 12–13/08 investigado e corrigido (falso positivo do Watchdog)**:
+  * ❌ Causa: `watchdog.yml` calculava "hoje" com `date -u` (UTC). Com o cron `30 23 * * *` atrasando além da meia-noite UTC (execuções em 00:00–00:07), o watchdog procurava o capítulo do **dia seguinte** — que ainda não existia — e re-disparava o pipeline, que publicava um capítulo prematuro com as notícias do dia anterior (padrão observado em 08/11, 08/12 e 08/13, gerados às 00:0X UTC)
+  * ✅ Removido capítulo prematuro `content/2026/08/13.mdx` (duplicava as notícias do 08/12 e quebrava a consistência calendário×conteúdo na home); `sitemap.xml` regenerado (38 URLs) e `rss.xml` apontado para o 08/12
+  * ✅ `watchdog.yml` agora usa fuso **America/Sao_Paulo** para "hoje" (checagem do capítulo e comparação do último run convertida para BRT no escape de "dia sem notícias") e re-dispara com `-f date=YYYY-MM-DD` (data-alvo explícita), recuperando sempre o dia correto
+  * ✅ `daily.yml` ganhou input `date` (workflow_dispatch) repassado ao `npm run pipeline <data>`; a notificação do Discord agora exibe o commit real criado no push (`NEW_SHA`) em vez do SHA base do run; o passo "Wait for Vercel" só executa quando houve commit
+
+## Notas técnicas (13/08/2026)
+
+* Nenhum capítulo legítimo se perdeu: o 08/12 foi publicado normalmente pelo cron das 21:00 UTC; o 08/13 prematuro foi removido e será regenerado pelo cron de hoje (~21:00 UTC / 18h BRT) com as notícias reais do dia.
+* Detecção do padrão: comparação dos timestamps de execução do `watchdog.yml` (00:00–00:07 UTC) com o `daily.yml` (21:53 UTC), confirmando que executar após a meia-noite UTC faz `date -u` avançar para o dia seguinte.
 
 ## Decisões editoriais (06/08/2026)
 
@@ -250,6 +283,15 @@ Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-011** (doc
 * **DE-9 — Foco em clube brasileiro**: notícia cujo título é focado em clube brasileiro (rescisões, transferências, escalações) sem jogador da Seleção nem frase forte da Seleção no título é off-context, mesmo com menção incidental de "CBF" no resumo.
 * **DE-10 — Astro estrangeiro sem vínculo**: notícia de astro/jogador de outra seleção ou liga estrangeira (ex.: Messi/Inter Miami) sem "brasil/brasileir*" e sem vínculo com a Seleção no título é off-context.
 * **DE-11 — Anúncio promocional/midiático**: anúncio de produto do próprio veículo de mídia ("lança edição/revista") é off-context.
+
+## Decisões editoriais (11/08/2026)
+
+Decisões da construção do dataset histórico e refinamento temático (detalhes em `docs/12-Dataset-Historico-e-Refinamento-de-Temas.md`):
+
+* **DE-12 — Períodos ANC/DNC**: as marcas de período são calculadas apenas pela data do post (ANC = 05–10/07/2026; DNC = 11/07 em diante) e gravadas no campo `period` das saídas, sem alterar o frontmatter original.
+* **DE-13 — Preservação integral dos dados**: nenhum campo existente é descartado; campos presentes só em alguns arquivos são mantidos e as diferenças estruturais documentadas na auditoria.
+* **DE-14 — Datas não normalizadas**: o texto original de `data_publicacao` (89 formatos distintos) é preservado; qualquer normalização fica para a fase do Wrapped.
+* **DE-15 — Temas DNC**: análise exploratória → 4 clusters candidatos (FIFA/Infantino, Mercado da bola, Reconstrução Seleção/Ancelotti-CBF, Pós-Copa imediato); a escolha definitiva dos 3–5 temas do Wrapped fica para a próxima etapa.
 
 ## Decisões editoriais (04/08/2026)
 
@@ -264,11 +306,13 @@ Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-009** (doc
 
 ## Próxima Iteração — Prioridade Alta
 
+* Definir os 3–5 temas finais do **Novo Ciclo Wrapped** a partir dos 4 clusters DNC (`data/themes_dnc.json`)
 * Implementar busca (RF-08)
 
 ## Prioridade Média
 
-* Implementar busca (RF-08)
+* Classificação temática por post do dataset (33 posts) para o Wrapped
+* Ranking de pessoas/notícias por tema
 
 ## Prioridade Baixa
 
@@ -339,9 +383,12 @@ Mitigação:
 
 O desenvolvimento da base do projeto está concluído. A aplicação está no ar.
 
+A base de dados do **Novo Ciclo Wrapped** está construída (`data/`) e a análise exploratória concluída.
+
 Os próximos passos são:
-1. Implementar busca (RF-08)
-2. Newsletter com serviço real de envio
+1. Definir os 3–5 temas finais do Wrapped e classificar os 33 posts por tema
+2. Implementar busca (RF-08)
+3. Newsletter com serviço real de envio
 
 ---
 
