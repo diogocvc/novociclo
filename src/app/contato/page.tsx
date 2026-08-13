@@ -70,14 +70,14 @@ export default function ContatoPage() {
           </a>
 
           <a
-            href="mailto:diogocvc@gmail.com"
+            href="mailto:oi@diogocvc.com"
             className="block p-6 bg-white rounded-md border border-gray-light hover:border-green-primary/30 transition-colors group"
           >
             <p className="text-sm text-green-primary font-medium uppercase tracking-wider mb-1">
               Email
             </p>
             <p className="text-lg font-semibold text-text group-hover:text-green-primary transition-colors">
-              diogocvc@gmail.com
+              oi@diogocvc.com
             </p>
           </a>
           <p className="text-sm text-text/60 mt-2">

@@ -60,12 +60,16 @@ Toda a infraestrutura deve operar dentro dos limites gratuitos ou de baixo custo
 
 | Variável | Descrição | Obrigatória |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | URL do site | Sim |
-| `NEXT_PUBLIC_SITE_NAME` | Nome do site | Sim |
-| `NEXT_PUBLIC_CYCLE_START_DATE` | Data de início do ciclo | Sim |
-| `NEXT_PUBLIC_WORLD_CUP_DATE` | Data da Copa 2030 | Sim |
+| `NEXT_PUBLIC_SITE_URL` | URL do site (`https://novociclo-red.vercel.app`) | Sim |
+| `NEXT_PUBLIC_SITE_NAME` | Nome do site (`Novo Ciclo`) | Sim |
+| `NEXT_PUBLIC_CYCLE_START_DATE` | Início do ciclo em ISO completo com offset **BRT** (ex.: `2026-07-05T00:00:00-03:00`) | Sim |
+| `NEXT_PUBLIC_WORLD_CUP_DATE` | Copa 2030 em ISO completo com offset **BRT** (ex.: `2030-06-11T00:00:00-03:00`) | Sim |
 | `LLM_API_KEY` | Chave da API de IA | Sim (pipeline) |
 | `NEWSLETTER_API_KEY` | Chave da API de newsletter | Conforme serviço |
+
+> ⚠️ **Formato obrigatório (incidente 13/08):** as variáveis de data devem usar ISO **com offset `-03:00`**. Valores **date-only** (`2026-07-05`) são interpretados por `new Date()` como meia-noite **UTC**, adiantando o dia do ciclo em 1 unidade no início de cada dia (produção exibia 41 quando o correto era 40). O código em `src/config/cycle.ts` normaliza date-only para meia-noite BRT (`parseDateEnv`), mas o valor correto deve ser definido no painel.
+
+> ⚠️ **Redeploy obrigatório:** variáveis `NEXT_PUBLIC_*` são embutidas no build. Alterá-las exige **Redeploy** em Deployments → ••• → Redeploy.
 
 ### Deploy
 

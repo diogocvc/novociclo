@@ -19,7 +19,7 @@ export default function CountdownBanner() {
     <div className="w-full max-w-[1200px] mx-auto px-6 lg:px-8 mt-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 rounded-lg overflow-hidden text-white text-center">
         <div className="bg-green-primary p-4 lg:p-6 flex flex-col items-center justify-center">
-          <span className="text-xs uppercase tracking-widest mb-1">DIAS PASSADOS</span>
+          <span className="text-xs uppercase tracking-widest mb-1">DIA DO CICLO</span>
           <span className="text-4xl lg:text-5xl font-bold font-headline">{data.daysElapsed}</span>
         </div>
         <div className="bg-green-light p-4 lg:p-6 flex flex-col items-center justify-center">

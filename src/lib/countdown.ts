@@ -1,7 +1,7 @@
 import { cycle } from "@/config/cycle";
 import type { CountdownData } from "@/types";
 import {
-  getDayNumber,
+  getDayNumberBRT,
   getTotalDuration,
   getDaysElapsed,
   getDaysRemaining,
@@ -15,7 +15,7 @@ export function getCountdownData(
   const totalDays = getTotalDuration(cycle.data_inicio, cycle.data_copa);
   const daysElapsed = getDaysElapsed(cycle.data_inicio);
   const daysRemaining = getDaysRemaining(now, cycle.data_copa);
-  const dayNumber = getDayNumber(cycle.data_inicio, now);
+  const dayNumber = getDayNumberBRT(cycle.data_inicio, now);
 
   return {
     daysElapsed: dayNumber,

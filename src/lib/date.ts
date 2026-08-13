@@ -35,6 +35,33 @@ export function getDayNumber(startDate: Date, currentDate: Date): number {
   return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
 }
 
+function getBRTDate(date: Date): { year: number; month: number; day: number } {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: BRT_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  return {
+    year: Number(parts.find((p) => p.type === "year")?.value ?? "0"),
+    month: Number(parts.find((p) => p.type === "month")?.value ?? "0"),
+    day: Number(parts.find((p) => p.type === "day")?.value ?? "0"),
+  };
+}
+
+export function getDayNumberBRT(
+  startDate: Date,
+  currentDate: Date
+): number {
+  const start = getBRTDate(startDate);
+  const current = getBRTDate(currentDate);
+  const startUtc = Date.UTC(start.year, start.month - 1, start.day);
+  const currentUtc = Date.UTC(current.year, current.month - 1, current.day);
+  const diffMs = currentUtc - startUtc;
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+}
+
 export function getTotalDuration(startDate: Date, endDate: Date): number {
   const diff = endDate.getTime() - startDate.getTime();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));

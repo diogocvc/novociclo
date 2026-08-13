@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 13/08/2026 (falso positivo do Watchdog investigado e corrigido: capítulo prematuro 08/13 removido; watchdog com fuso America/Sao_Paulo e data-alvo explícita; daily.yml com input `date` e notificação com commit real)
+**Última atualização:** 13/08/2026 (falso positivo do Watchdog investigado e corrigido: capítulo prematuro 08/13 removido; watchdog com fuso America/Sao_Paulo e data-alvo explícita; daily.yml com input `date` e notificação com commit real; contador do ciclo blindado para fuso BRT e env date-only normalizada para -03:00)
 
 ---
 
@@ -113,6 +113,7 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Correção Watchdog (fuso BRT + data-alvo explícita)** | ✅ Concluído |
 | **Remoção do Capítulo Prematuro 08/13** | ✅ Concluído |
 | **Daily Pipeline: input date + Commit Real na notificação** | ✅ Concluído |
+| **Contador do Ciclo (BRT + env date-only)** | ✅ Concluído |
 
 ---
 
@@ -268,6 +269,14 @@ novo-ciclo/
   * ✅ Removido capítulo prematuro `content/2026/08/13.mdx` (duplicava as notícias do 08/12 e quebrava a consistência calendário×conteúdo na home); `sitemap.xml` regenerado (38 URLs) e `rss.xml` apontado para o 08/12
   * ✅ `watchdog.yml` agora usa fuso **America/Sao_Paulo** para "hoje" (checagem do capítulo e comparação do último run convertida para BRT no escape de "dia sem notícias") e re-dispara com `-f date=YYYY-MM-DD` (data-alvo explícita), recuperando sempre o dia correto
   * ✅ `daily.yml` ganhou input `date` (workflow_dispatch) repassado ao `npm run pipeline <data>`; a notificação do Discord agora exibe o commit real criado no push (`NEW_SHA`) em vez do SHA base do run; o passo "Wait for Vercel" só executa quando houve commit
+* ✅ **Incidente 13/08 — contador do ciclo deslocado + env date-only** (root cause analisada e corrigida no código):
+  * ❌ Causa raiz: `NEXT_PUBLIC_CYCLE_START_DATE` e `NEXT_PUBLIC_WORLD_CUP_DATE` estavam no Vercel como **date-only** (`2026-07-05`), que `new Date()` interpreta como meia-noite **UTC** — 3h antes do horário de Brasília. Com o dia começando às 21h BRT do dia anterior, o contador adiantava 1 dia no início de cada dia em produção (ex.: exibia 41 no dia 13/08, quando o correto é 40).
+  * ✅ `src/config/cycle.ts` normaliza date-only para `T00:00:00-03:00` (meia-noite BRT) e tem fallback para valores inválidos (`parseDateEnv`, testada).
+  * ✅ `src/lib/date.ts` ganhou `getDayNumberBRT`, que calcula o dia do ciclo pela **data-calendário em BRT** (via `Intl` com `America/Sao_Paulo`), não pelo timestamp UTC; `src/lib/countdown.ts` passou a usá-la.
+  * ✅ Rótulo do banner alterado de "DIAS PASSADOS" para "DIA DO CICLO" (`CountdownBanner.tsx`).
+  * ✅ Testes de regressão adicionados: borda 22h BRT 12/08 → dia 39; 00h BRT 13/08 → dia 40; env date-only → 05/07 00:00 BRT.
+  * ✅ `.env.example` corrigido (variável renomeada para `NEXT_PUBLIC_CYCLE_START_DATE` com formato ISO completo `2026-07-05T00:00:00-03:00`).
+  * ⚠️ Pendência no painel: ajustar os valores no Vercel (Settings → Environment Variables) para o formato completo com offset e **redeployar** — valores `NEXT_PUBLIC_*` são embutidos no build.
 
 ## Notas técnicas (13/08/2026)
 

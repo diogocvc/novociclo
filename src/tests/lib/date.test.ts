@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   getDayNumber,
+  getDayNumberBRT,
   getTotalDuration,
   getDaysElapsed,
   getDaysRemaining,
@@ -23,6 +24,27 @@ describe("getDayNumber", () => {
   it("returns correct number for a later date", () => {
     const day = getDayNumber(startDate, new Date("2026-07-06T00:00:00-03:00"));
     expect(day).toBe(2);
+  });
+});
+
+describe("getDayNumberBRT", () => {
+  it("returns 1 for the start date", () => {
+    expect(getDayNumberBRT(startDate, startDate)).toBe(1);
+  });
+
+  it("returns correct number for a later date", () => {
+    const day = getDayNumberBRT(startDate, new Date("2026-07-06T00:00:00-03:00"));
+    expect(day).toBe(2);
+  });
+
+  it("counts by the BRT calendar day, not the UTC instant", () => {
+    const lateNightBRT = new Date("2026-08-13T01:30:00Z");
+    expect(getDayNumberBRT(startDate, lateNightBRT)).toBe(39);
+  });
+
+  it("advances at midnight BRT (03:00Z)", () => {
+    const midnightBRT = new Date("2026-08-13T03:00:00Z");
+    expect(getDayNumberBRT(startDate, midnightBRT)).toBe(40);
   });
 });
 
