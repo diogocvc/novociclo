@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 13/08/2026 (falso positivo do Watchdog investigado e corrigido: capítulo prematuro 08/13 removido; watchdog com fuso America/Sao_Paulo e data-alvo explícita; daily.yml com input `date` e notificação com commit real; contador do ciclo blindado para fuso BRT e env date-only normalizada para -03:00)
+**Última atualização:** 13/08/2026 (página **Novo Ciclo Wrapped** publicada em `/wrapped`: seções imersivas a partir do mockup, 9 notícias com links originais + capítulo do dia, imagens otimizadas em `public/wrapped/`, rota no sitemap)
 
 ---
 
@@ -114,6 +114,7 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Remoção do Capítulo Prematuro 08/13** | ✅ Concluído |
 | **Daily Pipeline: input date + Commit Real na notificação** | ✅ Concluído |
 | **Contador do Ciclo (BRT + env date-only)** | ✅ Concluído |
+| **Página Wrapped (/wrapped)** | ✅ Concluído |
 
 ---
 
@@ -161,6 +162,16 @@ novo-ciclo/
 
 ## Concluído na Última Iteração
 
+* ✅ **Página Novo Ciclo Wrapped** (`src/app/wrapped/page.tsx` + `src/components/wrapped/WrappedPage.tsx`, rota `/wrapped`):
+  * ✅ Imersiva standalone, port do mockup `wrapped/Novo Ciclo Wrapped.zip`: hero com timeline não-linear 2026→2030 (marcadores 05/07 Eliminação, 11/07 Início NC, 11/08 2,5% do ciclo, 11/06/2030 Copa), nav flutuante lateral, contadores animados, 7 seções (hero, números, ANC/DNC, 3 histórias DNC, créditos)
+  * ✅ **NC em Números**: 33 dias, 148 notícias, 3,55 refs/dia, 19 países + bloco de datas (primeira data 05/07, 1ª publicação 11/07, ANC 6, DNC 27)
+  * ✅ **ANC/DNC**: 6 × 27 posts com contexto dos períodos
+  * ✅ **3 histórias do DNC**: Reconstrução/Ancelotti (12/27 posts, 60×, CBF, pico julho), Futuro dos Jogadores (45 notícias, personagens/clubes em pills), Crise FIFA (10/27 posts, 42 notícias, pico 03/08 — estatísticas reais do cluster F do `themes_dnc.json`)
+  * ✅ **9 notícias com 2 links cada**: original (ge/Placar/UOL, `_blank`) + capítulo do dia no site (ex.: `/2026/07/14`); "Endrick monitorado pela Roma" → capítulo `/2026/08/03` (cap. 02/08 removido); renovação do Vini → Placar (decisão)
+  * ✅ **Imagens otimizadas**: `public/wrapped/{ancelotti,jogadores,infantino}.jpg` (PNGs 4096×3861 / ~35MB → jpg 1400px / ~1,1MB), usadas via `next/image`
+  * ✅ **Barlow Condensed** adicionado ao `layout.tsx` (`--font-barlow-condensed`) para fidelidade ao mockup (Bungee Shade + Barlow)
+  * ✅ `/wrapped` adicionado ao `generate-sitemap.ts` (priority 0.5) e sitemap regenerado (39 URLs); decisão: não adicionar ao Header
+  * ✅ Lint (0 erros), typecheck e 106 testes passando; build de produção gera `/wrapped` estática
 * ✅ Setup Next.js 16 + TypeScript + Tailwind v4
 * ✅ Estrutura de diretórios
 * ✅ Tipos compartilhados (types/)

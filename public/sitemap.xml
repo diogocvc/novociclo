@@ -9,6 +9,10 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://novociclo-red.vercel.app/wrapped</loc>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://novociclo-red.vercel.app/creditos</loc>
     <priority>0.3</priority>
   </url>

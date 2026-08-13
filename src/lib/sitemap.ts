@@ -5,6 +5,7 @@ const DEFAULT_SITE_URL = "https://novociclo-red.vercel.app";
 const STATIC_ROUTES = [
   { path: "", priority: "1.0" },
   { path: "/sobre", priority: "0.6" },
+  { path: "/wrapped", priority: "0.5" },
   { path: "/creditos", priority: "0.3" },
   { path: "/contato", priority: "0.3" },
 ];

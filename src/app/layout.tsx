@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Inter, Inter_Tight, Bungee_Shade } from "next/font/google";
+import {
+  Inter,
+  Inter_Tight,
+  Bungee_Shade,
+  Barlow_Condensed,
+} from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -17,6 +22,12 @@ const bungeeShade = Bungee_Shade({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-bungee-shade",
+});
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
+  variable: "--font-barlow-condensed",
 });
 
 export const metadata: Metadata = {
@@ -39,7 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${inter.variable} ${interTight.variable} ${bungeeShade.variable}`}
+      className={`${inter.variable} ${interTight.variable} ${bungeeShade.variable} ${barlowCondensed.variable}`}
     >
       <head>
         <meta charSet="UTF-8" />
