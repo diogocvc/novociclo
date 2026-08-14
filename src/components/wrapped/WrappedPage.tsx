@@ -774,6 +774,22 @@ export default function WrappedPage() {
                 <h3 className="text-lg font-semibold mb-3 leading-snug" style={{ color: t.accent, fontFamily: DISPLAY }}>
                   Carlo Ancelotti: O homem escolhido para começar de novo.
                 </h3>
+                <div
+                  className="relative aspect-square overflow-hidden md:hidden mb-8"
+                  style={{ background: t.card }}
+                >
+                  <Image
+                    src="/wrapped/ancelotti.jpg"
+                    alt="Carlo Ancelotti com escudo da CBF ao fundo"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `linear-gradient(to top, ${t.bg}cc, transparent 60%)` }}
+                  />
+                </div>
                 <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: t.sub }}>
                   Entre planejamento, amistosos e novas convocações, Ancelotti foi
                   uma das primeiras figuras a definir a narrativa do novo ciclo.
@@ -801,7 +817,7 @@ export default function WrappedPage() {
                   ))}
                 </div>
               </div>
-              <div className="relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden" style={{ background: t.card }}>
+              <div className="hidden md:block relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden" style={{ background: t.card }}>
                 <Image
                   src="/wrapped/ancelotti.jpg"
                   alt="Carlo Ancelotti com escudo da CBF ao fundo"
@@ -837,7 +853,7 @@ export default function WrappedPage() {
             />
             <div className="relative max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
               <div
-                className="relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden order-2 md:order-1"
+                className="hidden md:block relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden"
                 style={{ background: t.card }}
               >
                 <Image
@@ -852,7 +868,7 @@ export default function WrappedPage() {
                   style={{ background: `linear-gradient(to top, ${t.bg}cc, transparent 60%)` }}
                 />
               </div>
-              <div className="order-1 md:order-2">
+              <div>
                 <div className="flex items-center gap-3 mb-6">
                   <span
                     className="text-xs px-3 py-1.5 tracking-widest uppercase"
@@ -879,6 +895,22 @@ export default function WrappedPage() {
                   <strong style={{ color: t.fg }}>45 notícias</strong>{" "}
                   movimentaram o universo das transferências.
                 </p>
+                <div
+                  className="relative aspect-square overflow-hidden md:hidden mb-8"
+                  style={{ background: t.card }}
+                >
+                  <Image
+                    src="/wrapped/jogadores.jpg"
+                    alt="Vini Jr. e Endrick com a camisa da Seleção"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `linear-gradient(to top, ${t.bg}cc, transparent 60%)` }}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-6 mb-8">
                   {[
                     {
@@ -970,6 +1002,22 @@ export default function WrappedPage() {
                 <h3 className="text-lg font-semibold mb-3 leading-snug" style={{ color: t.muted, fontFamily: DISPLAY }}>
                   Gianni Infantino: Durante a Copa, era notícia. Agora, virou alvo.
                 </h3>
+                <div
+                  className="relative aspect-square overflow-hidden md:hidden mb-8"
+                  style={{ background: t.card }}
+                >
+                  <Image
+                    src="/wrapped/infantino.jpg"
+                    alt="Gianni Infantino, presidente da FIFA"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{ background: `linear-gradient(to top, ${t.bg}cc, transparent 60%)` }}
+                  />
+                </div>
                 <p className="text-sm leading-relaxed mb-8 max-w-sm" style={{ color: t.sub }}>
                   Conforme a Copa ficava para trás, as atenções se voltaram para
                   as consequências institucionais — e para os conflitos que a
@@ -1002,7 +1050,7 @@ export default function WrappedPage() {
                   ))}
                 </div>
               </div>
-              <div className="relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden" style={{ background: t.card }}>
+              <div className="hidden md:block relative aspect-square md:aspect-auto md:h-[70vh] overflow-hidden" style={{ background: t.card }}>
                 <Image
                   src="/wrapped/infantino.jpg"
                   alt="Gianni Infantino, presidente da FIFA"
@@ -1043,7 +1091,7 @@ export default function WrappedPage() {
               }}
             />
 
-            <div className="relative max-w-2xl mx-auto">
+            <div className="relative max-w-3xl mx-auto w-full">
               <div className="inline-block px-4 py-1.5 mb-6" style={{ border: `1px solid ${t.accent}50`, background: `${t.accent}0d` }}>
                 <span className="text-xs tracking-widest uppercase" style={{ color: t.accent, fontFamily: BUNGEE }}>
                   Créditos
@@ -1071,17 +1119,18 @@ export default function WrappedPage() {
                   { role: "Design", name: "Diogo Carvalho" },
                   { role: "Editoria", name: "Diogo Carvalho" },
                   { role: "Desenvolvimento", name: "Opencode + DeepSeek" },
+                  { role: "Análise de dados", name: "Opencode + DeepSeek" },
                 ].map((c, i) => (
                   <div
                     key={c.role}
-                    className="flex justify-between items-center px-6 py-4"
-                    style={{ borderBottom: i < 3 ? `1px solid ${t.border}` : undefined }}
+                    className="flex justify-between items-center gap-6 px-6 py-4"
+                    style={{ borderBottom: i < 4 ? `1px solid ${t.border}` : undefined }}
                   >
-                    <span className="text-xs uppercase tracking-widest" style={{ color: t.muted }}>
+                    <span className="text-xs uppercase tracking-widest shrink-0" style={{ color: t.muted }}>
                       {c.role}
                     </span>
                     <span
-                      className="text-sm font-semibold"
+                      className="text-sm font-semibold shrink-0 text-right"
                       style={{ color: t.fg, fontFamily: DISPLAY, letterSpacing: "0.05em" }}
                     >
                       {c.name}
