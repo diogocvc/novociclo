@@ -362,7 +362,7 @@ export const pipelineConfig = {
     backoffMs: 1000,
   },
   llm: {
-    model: 'gpt-4',
+    model: 'openai/gpt-oss-120b',
     maxTokens: 4000,
     temperature: 0.3,
   },

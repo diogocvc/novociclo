@@ -41,7 +41,7 @@ Toda a infraestrutura deve operar dentro dos limites gratuitos ou de baixo custo
 | Automação | GitHub Actions | Gratuito (2000 min/mês) |
 | Domínio | A definir | ~ R$ 40/ano |
 | Newsletter | A definir | Gratuito (até ~500 assinantes) |
-| API de IA | A definir (OpenAI, Anthropic) | Pay-per-use |
+| API de IA | Groq (openai/gpt-oss-120b) | Gratuito (free tier) |
 
 ---
 
