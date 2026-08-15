@@ -136,7 +136,11 @@ export async function runDailyPipeline(
         return Promise.resolve({ success: false, error: "Capítulo não aprovado na revisão" });
       }
       const researcherOutput = result.outputs[0]?.data as { news?: unknown } | undefined;
+      const curatorOutput = result.outputs[1]?.data as { events?: unknown } | undefined;
+      const editorOutput = result.outputs[2]?.data as { decision?: unknown } | undefined;
       input.news = researcherOutput?.news;
+      input.events = curatorOutput?.events;
+      input.decision = editorOutput?.decision;
       return retry(() => publisher.execute(input), "Publicador");
     }),
     step("Newsletter", () => {

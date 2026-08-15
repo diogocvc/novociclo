@@ -36,6 +36,12 @@ export class PublisherAgent extends BaseAgent {
       }
 
       const allNews = input.news as News[] | undefined;
+      const events = input.events as
+        | { id: string; nivel_de_importancia?: number; noticias_relacionadas?: string[] }[]
+        | undefined;
+      const decision = input.decision as
+        | { eventsOrder?: string[] }
+        | undefined;
 
       const date = input.date as Date;
       const year = date.getFullYear();
@@ -68,9 +74,40 @@ export class PublisherAgent extends BaseAgent {
       };
 
       if (allNews && allNews.length > 0) {
-        frontmatter.noticia_destaque = allNews[0];
-        if (allNews.length > 1) {
-          frontmatter.noticias_referencia = allNews.slice(1);
+        let orderedNews: News[] = allNews;
+
+        if (events && events.length > 0) {
+          const eventOrder = decision?.eventsOrder ?? [];
+          const orderedEvents = eventOrder.length
+            ? eventOrder
+                .map((id) => events.find((e) => e.id === id))
+                .filter((e): e is NonNullable<typeof e> => Boolean(e))
+            : [...events].sort(
+                (a, b) =>
+                  (b.nivel_de_importancia ?? 0) - (a.nivel_de_importancia ?? 0)
+              );
+
+          orderedNews = [];
+          const used = new Set<string>();
+          for (const event of orderedEvents) {
+            for (const ref of event.noticias_relacionadas ?? []) {
+              const match = allNews.find(
+                (n) => n.id === ref || n.url === ref
+              );
+              if (match && !used.has(match.id)) {
+                used.add(match.id);
+                orderedNews.push(match);
+              }
+            }
+          }
+          for (const n of allNews) {
+            if (!used.has(n.id)) orderedNews.push(n);
+          }
+        }
+
+        frontmatter.noticia_destaque = orderedNews[0];
+        if (orderedNews.length > 1) {
+          frontmatter.noticias_referencia = orderedNews.slice(1);
         }
       }
 

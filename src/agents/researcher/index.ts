@@ -75,6 +75,7 @@ const EXCLUDED_KEYWORDS = [
   "futebol de areia",
   "futebol feminino",
   "copa do mundo feminina", "copa feminina", "mundial feminino",
+  "copa do mundo 2027", "copa do mundo de 2027", "copa de 2027", "copa 2027", "mundial 2027",
   "copa das nações",
   "fisiculturismo",
   "liga das nações",

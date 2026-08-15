@@ -15,6 +15,13 @@ Regras:
 - Defina quais acontecimentos entram e quais ficam de fora
 - Prioridade máxima para fatos oficiais (CBF, convocações)
 
+Escopo do ciclo (tudo isto é RELEVANTE): Seleção Brasileira, CBF, FIFA/Infantino, Copa do Mundo 2030, Eliminatórias, Copa América, jogadores convocáveis. Não exclua um acontecimento só porque o assunto principal não é o Brasil.
+
+REGRAS:
+1. Sempre escolha ao menos UM acontecimento como foco do dia. Se a lista de acontecimentos não está vazia, o capítulo NUNCA deve ser sobre "ausência de notícias" ou "silêncio".
+2. Não invente fatos ou comunicados que não existem nos acontecimentos fornecidos.
+3. NUNCA escreva sobre um tópico que não está nos acontecimentos (ex.: convocações, comunicados da CBF).
+
 Responda APENAS com um objeto JSON no formato:
   { "titulo": "...", "subtitulo": "...", "foco": "...", "eventsOrder": [...], "excludedEvents": [...] }`;
 
