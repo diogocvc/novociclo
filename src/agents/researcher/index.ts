@@ -143,6 +143,11 @@ const OTHER_NATIONALITIES = [
   "portugal", "português", "portuguesa", "portugues",
   "holanda", "holandês", "holandesa", "holandes",
   "bélgica", "belga",
+  "venezuela", "venezuelano", "venezuelana", "venezuelanos",
+  "colômbia", "colombia", "colombiano", "colombiana",
+  "equador", "equatoriano", "equatoriana",
+  "chile", "chileno", "chilena",
+  "peru", "peruano", "peruana",
 ];
 
 const SELEÇÃO_STRONG_PHRASES = [
@@ -152,7 +157,6 @@ const SELEÇÃO_STRONG_PHRASES = [
   "convocação", "convocacoes", "convocações",
   "convocado", "convocados", "convocada", "convocadas",
   "copa do mundo 2030", "copa 2030", "mundial 2030",
-  "cbf", "confederação brasileira de futebol",
   "ancelotti",
 ];
 

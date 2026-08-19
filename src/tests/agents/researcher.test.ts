@@ -539,4 +539,74 @@ describe("ResearcherAgent", () => {
     expect(titles).toContain("Real Madrid anuncia renovação com Vini Jr");
     expect(titles).toContain("Al-Ittihad anuncia saída do volante Fabinho, que jogou a Copa de 2026; jogador está livre");
   });
+
+  it("excludes CBF news focused on a club director/celebrity (Stábile/Memphis)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "CBF condena ameaças contra Stábile durante novela por Memphis; veja nota",
+          "https://www.band.com.br/esportes/cbf-condena-ameacas-contra-stabile-durante-novela-por-memphis-veja-nota-202608181745",
+        ),
+        resumo_original:
+          "Entidade prestou solidariedade ao dirigente após relatos de intimidações com armas e vazamento de dados de familiares",
+        data_publicacao: "2026-08-18T17:45:11-03:00",
+      },
+      {
+        ...makeNews("n2", "Seleção Brasileira joga amistoso em setembro"),
+        data_publicacao: "2026-08-18T10:00:00-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-08-18") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("CBF condena ameaças contra Stábile durante novela por Memphis; veja nota");
+    expect(titles).toContain("Seleção Brasileira joga amistoso em setembro");
+  });
+
+  it("excludes journalist profile news without Seleção context (Manu Gutiérrez)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "Manu Gutiérrez, o repórter da Copa do Mundo 2026",
+          "https://placar.com.br/copa-do-mundo/manu-gutierrez-o-reporter-da-copa-do-mundo-2026",
+        ),
+        resumo_original:
+          "'Encontrei no microfone uma alternativa para me aproximar desses campos que um dia sonhei em estar', disse o jornalista venezuelano",
+        data_publicacao: "2026-08-17T15:26:38-03:00",
+      },
+      {
+        ...makeNews("n2", "Seleção Brasileira joga amistoso em setembro"),
+        data_publicacao: "2026-08-18T10:00:00-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-08-18") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).not.toContain("Manu Gutiérrez, o repórter da Copa do Mundo 2026");
+    expect(titles).toContain("Seleção Brasileira joga amistoso em setembro");
+  });
+
+  it("keeps Copa 2030 context news (Greek promising generation)", async () => {
+    mockFetchAllRss.mockResolvedValueOnce([
+      {
+        ...makeNews(
+          "n1",
+          "Olho neles: conheça a promissora geração grega",
+          "https://placar.com.br/futebol-europeu/olho-neles-conheca-a-promissora-geracao-grega",
+        ),
+        resumo_original:
+          "Com jovens promessas emergindo no futebol europeu, a Grécia tem tudo para voltar aos maiores palcos e ir longe na Copa do Mundo 2030",
+        data_publicacao: "2026-08-18T16:10:54-03:00",
+      },
+    ]);
+
+    const result = await agent.execute({ date: new Date("2026-08-19") });
+    expect(result.success).toBe(true);
+    const titles = ((result.data as { news: { titulo: string }[] }).news).map((n) => n.titulo);
+    expect(titles).toContain("Olho neles: conheça a promissora geração grega");
+  });
 });
