@@ -233,6 +233,21 @@ const NOSTALGIA_KEYWORDS = [
   "time do coração", "time do coracao",
 ];
 
+const WOMENS_FOOTBALL_FIGURES = [
+  "marta", "cristiane", "debinha", "gabi zanotti", "andressa alves",
+  "forminha", "raissa feitosa", "tamires", "bruna benites",
+  "arthur elias",
+];
+
+const WOMENS_FOOTBALL_CONTEXT = [
+  "copa do mundo feminina", "copa feminina", "mundial feminino",
+  "copa do mundo 2027", "copa do mundo de 2027", "copa de 2027",
+  "copa 2027", "mundial 2027",
+  "futebol feminino", "time feminino", "seleção feminina",
+  "selecao feminina", "selecao feminino",
+  "orlando pride", "orlando",
+];
+
 function cleanText(raw: string): string {
   return raw.replace(/<[^>]*>/g, " ");
 }
@@ -327,15 +342,34 @@ function hasPromoAnnouncement(title: string): boolean {
   return t.includes("edição") || t.includes("edicao") || t.includes("revista");
 }
 
+function hasWomensFootballContext(title: string, resumo: string): boolean {
+  const text = buildText(title, resumo);
+  const titleLower = title.toLowerCase();
+
+  const hasFigure = WOMENS_FOOTBALL_FIGURES.some((f) => text.includes(f));
+  const hasContext = WOMENS_FOOTBALL_CONTEXT.some((c) => text.includes(c));
+
+  if (hasFigure && hasContext) return true;
+
+  if (hasFigure) {
+    const hasSelecao = text.includes("seleção") || text.includes("selecao");
+    const hasCopa = text.includes("copa");
+    if (hasSelecao && hasCopa) return true;
+  }
+
+  return false;
+}
+
 function hasExcludedContent(title: string, resumo: string, url: string): boolean {
   const urlLower = url.toLowerCase();
   const fullText = buildText(title, resumo);
   const cleanResumo = cleanText(resumo).toLowerCase();
-  const focused = `${title.toLowerCase()} ${cleanResumo.slice(0, 200)}`;
+  const focused = `${title.toLowerCase()} ${cleanResumo.slice(0, 500)}`;
 
   if (EXCLUDED_KEYWORDS.some((kw) => focused.includes(kw))) return true;
   if (EXCLUDED_URL_PATTERNS.some((p) => urlLower.includes(p))) return true;
   if (hasFamilyRelativeContext(title)) return true;
+  if (hasWomensFootballContext(title, resumo)) return true;
 
   const hasNationality = OTHER_NATIONALITIES.some((n) => fullText.includes(n));
   const hasSelecao = fullText.includes("seleção") || fullText.includes("selecao");
@@ -414,6 +448,7 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   if (hasPromoAnnouncement(title)) return false;
   if (hasBrazilianClubFocusOffContext(title)) return false;
   if (hasForeignStarOffContext(title, resumo ?? "")) return false;
+  if (hasWomensFootballContext(title, resumo ?? "")) return false;
 
   if (hasStrongSelecaoContext(text)) return true;
 
