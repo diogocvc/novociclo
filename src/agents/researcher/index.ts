@@ -102,6 +102,9 @@ const EXCLUDED_KEYWORDS = [
   "maratonista", "maratona",
   "desaparecido", "desaparecimento",
   "doping", "suspensão por doping",
+  "rugbi", "râgbi",
+  "paralimpiadas", "paraolimpíadas", "paraolimpico", "paraolímpico",
+  "cadeira de rodas",
 ];
 
 const EXCLUDED_URL_PATTERNS = [
@@ -114,6 +117,7 @@ const EXCLUDED_URL_PATTERNS = [
   "/nfl/", "/futebol-americano/",
   "/feminina/", "/copa-do-mundo-feminina/", "/futebol-feminino/",
   "/entretenimento/",
+  "/paralimpiadas/", "/olimpiadas/", "/parapan/",
   "/sp/", "/rj/", "/ce/", "/rs/", "/mg/", "/ba/",
   "/pr/", "/pe/", "/sc/", "/df/", "/es/", "/go/",
   "/ac/", "/al/", "/am/", "/ap/", "/ma/", "/mt/",
