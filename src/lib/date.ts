@@ -109,3 +109,19 @@ export function getWeekNumber(
   const dayNumber = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
   return Math.ceil(dayNumber / 7);
 }
+
+const PT_TO_EN: Record<string, string> = {
+  "Seg": "Mon", "Ter": "Tue", "Qua": "Wed", "Qui": "Thu",
+  "Sex": "Fri", "Sáb": "Sat", "Dom": "Sun",
+  "Jan": "Jan", "Fev": "Feb", "Mar": "Mar", "Abr": "Apr",
+  "Mai": "May", "Jun": "Jun", "Jul": "Jul", "Ago": "Aug",
+  "Set": "Sep", "Out": "Oct", "Nov": "Nov", "Dez": "Dec",
+};
+
+export function parseRSSDate(raw: string): Date {
+  let normalized = raw;
+  for (const [pt, en] of Object.entries(PT_TO_EN)) {
+    normalized = normalized.replace(new RegExp(`\\b${pt}\\b`, "g"), en);
+  }
+  return new Date(normalized);
+}

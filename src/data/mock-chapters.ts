@@ -1,5 +1,6 @@
 import type { Chapter, News } from "@/types";
 import { getAllChapters, getChapterNarrative } from "@/lib/content";
+import { parseRSSDate } from "@/lib/date";
 import { mockNews } from "./mock-news";
 
 function buildChapter(raw: ReturnType<typeof getAllChapters>[number]): Chapter {
@@ -62,12 +63,12 @@ export function getLatestNewsItems(count: number): News[] {
   for (const chapter of chapters) {
     if (chapter.noticia_destaque && !seen.has(chapter.noticia_destaque.id)) {
       seen.add(chapter.noticia_destaque.id);
-      allNews.push({ news: chapter.noticia_destaque, pubDate: new Date(chapter.noticia_destaque.data_publicacao) });
+      allNews.push({ news: chapter.noticia_destaque, pubDate: parseRSSDate(chapter.noticia_destaque.data_publicacao) });
     }
     for (const ref of chapter.noticias_referencia) {
       if (!seen.has(ref.id)) {
         seen.add(ref.id);
-        allNews.push({ news: ref, pubDate: new Date(ref.data_publicacao) });
+        allNews.push({ news: ref, pubDate: parseRSSDate(ref.data_publicacao) });
       }
     }
   }

@@ -1,7 +1,7 @@
 import { isSameDay, format } from "date-fns";
 import type { News } from "@/types";
 import NewsCard from "@/components/chapter/NewsCard";
-import { getTodayBRT, getHourBRT } from "@/lib/date";
+import { getTodayBRT, getHourBRT, parseRSSDate } from "@/lib/date";
 
 interface Props {
   date?: Date;
@@ -33,7 +33,7 @@ export default function NoNewsToday({ date, latestNews }: Props) {
             <div key={news.id}>
               <NewsCard news={news} />
               <p className="mt-1 text-xs text-gray-medium">
-                Notícia publicada em {format(new Date(news.data_publicacao), "dd/MM/yy")}
+                Notícia publicada em {format(parseRSSDate(news.data_publicacao), "dd/MM/yy")}
               </p>
             </div>
           ))}
