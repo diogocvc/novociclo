@@ -25,7 +25,7 @@ Sempre que uma tarefa relevante for concluída ou iniciada, este documento deve 
 
 **Status Geral:** Em Desenvolvimento
 
-**Última atualização:** 13/08/2026 (página **Novo Ciclo Wrapped** publicada em `/wrapped`: seções imersivas a partir do mockup, 9 notícias com links originais + capítulo do dia, imagens otimizadas em `public/wrapped/`, rota no sitemap)
+**Última atualização:** 15/08/2026 (migração do LLM para `openai/gpt-oss-120b` testada end-to-end: capítulo 2026-08-15 publicado, prompts do Curador/Editor alinhados ao novo modelo, destaque editorial corrigido no Publicador)
 
 ---
 
@@ -115,6 +115,11 @@ Implementar a base do projeto: setup, componentes, conteúdo, scripts e agentes.
 | **Daily Pipeline: input date + Commit Real na notificação** | ✅ Concluído |
 | **Contador do Ciclo (BRT + env date-only)** | ✅ Concluído |
 | **Página Wrapped (/wrapped)** | ✅ Concluído |
+| **Migração LLM → openai/gpt-oss-120b** | ✅ Concluído |
+| **Ajuste Prompts p/ Novo Modelo** | ✅ Concluído |
+| **Destaque Editorial no Publicador** | ✅ Concluído |
+| **Veto Copa Feminina 2027 (Researcher)** | ✅ Concluído |
+| **Capítulo 2026-08-15 (gpt-oss)** | ✅ Concluído |
 
 ---
 
@@ -289,6 +294,21 @@ novo-ciclo/
   * ✅ `.env.example` corrigido (variável renomeada para `NEXT_PUBLIC_CYCLE_START_DATE` com formato ISO completo `2026-07-05T00:00:00-03:00`).
   * ⚠️ Pendência no painel: ajustar os valores no Vercel (Settings → Environment Variables) para o formato completo com offset e **redeployar** — valores `NEXT_PUBLIC_*` são embutidos no build.
 
+## Concluído na Última Iteração (15/08/2026)
+
+* ✅ **Migração do LLM para `openai/gpt-oss-120b`** (a Groq descontinuaria o `llama-3.3-70b-versatile` em 16/08/2026):
+  * ✅ Modelo centralizado em `src/lib/llm.ts` (`DEFAULT_MODEL`) — nenhum agente faz override; docs `10-automation.md` e `11-deployment.md` atualizadas (commit `eb6c5ae`)
+* ✅ **Fix capítulo 14/08**: removida a notícia do Léo Derik (condenação por estupro, fora do contexto do ciclo) — `noticias_referencia`, `subtitulo`, `resumo` e `corpo` reescritos; URL adicionada ao `news-blocklist.json` (commit `d5b5202`)
+* ✅ **Teste da migração via pipeline 15/08** (rodou de ponta a ponta: Pesquisador → Curador → Editor → Escritor → Revisor → Publicador → SEO):
+  * ✅ Descoberto que o gpt-oss é **mais literal** que o llama: descartava notícias de FIFA/Infantino como "não relacionadas ao Brasil" (reasoning explícito) e o Editor-chefe chegou a inventar um capítulo sobre "silêncio da CBF" (sem base nas notícias) — ambos corrigidos via prompt
+  * ✅ **Curador** ganhou regras de não-descarte: FIFA/Infantino/CBF/Copa 2030 são sempre relevantes; "na dúvida entre incluir ou descartar, INCLUA" (o Researcher já pré-filtra)
+  * ✅ **Editor-chefe** ganhou regras: sempre escolher ao menos UM acontecimento como foco; nunca inventar fatos/comunicados que não existem nos acontecimentos
+  * ✅ **Publicador** corrigido: `noticia_destaque` agora segue a **ordem editorial dos eventos** (eventsOrder/importância) em vez de `allNews[0]` — evitou a Copa Feminina 2027 virar destaque de um capítulo sobre Infantino
+  * ✅ **Researcher** passou a excluir "Copa do Mundo 2027"/"Copa 2027" (Copa Feminina, fora do escopo; a masculina é 2026 e 2030)
+* ✅ **Capítulo `content/2026/08/15.mdx` publicado** com o novo modelo ("Nova Zelândia retira apoio a Infantino na corrida pela presidência da FIFA") + `rss.xml`/`sitemap.xml` atualizados (commit `40d8d72`)
+* ✅ Typecheck e 106 testes passando após os ajustes; push para `main`
+* ⚠️ Nota técnica: as falhas 403/`fetch failed` observadas durante o teste eram **flap de rede do sandbox** (VPN), não da migração — confirmado com a rede estável e o pipeline completo executando sem erros
+
 ## Notas técnicas (13/08/2026)
 
 * Nenhum capítulo legítimo se perdeu: o 08/12 foi publicado normalmente pelo cron das 21:00 UTC; o 08/13 prematuro foi removido e será regenerado pelo cron de hoje (~21:00 UTC / 18h BRT) com as notícias reais do dia.
@@ -328,6 +348,57 @@ Regras de escopo/relevância estabelecidas hoje, registradas em **ADR-009** (doc
 
 * Definir os 3–5 temas finais do **Novo Ciclo Wrapped** a partir dos 4 clusters DNC (`data/themes_dnc.json`)
 * Implementar busca (RF-08)
+* **[NOVO] Bot Discord para gestão de notícias via smartphone** (ver seção abaixo)
+
+## Bot Discord para Gestão via Smartphone (23/08/2026)
+
+**Problema:** Notícias fora de contexto ainda precisam ser removidas manualmente via computador (edição de blocklist + MDX + commit). O autor quer uma forma simples de fazer isso pelo smartphone via Discord.
+
+**Solução:** Bot Discord usando HTTP Interactions Endpoint (não Gateway), hospedado no Vercel free. O bot recebe slash commands e processa remoções de notícias.
+
+**Arquitetura:**
+- Endpoint: `src/app/api/discord/interactions/route.ts` (Next.js App Router)
+- Verificação Ed25519 via `discord-interactions`
+- Deferred responses para operações que demoram (ler/editar arquivos, git commit)
+- Tudo persistido no Git (blocklist.json + MDX)
+
+**Comandos planejados:**
+
+| Comando | Descrição | Parâmetros |
+|---------|-----------|------------|
+| `/remover` | Remove notícia de um capítulo | `data` (AAAA-MM-DD), `url` |
+| `/ultima-edicao` | Mostra resumo do último capítulo | — |
+| `/countdown` | Contagem regressiva para Copa 2030 | — |
+| `/capitulo` | Acessa capítulo por data | `data` (AAAA-MM-DD) |
+
+**Fluxo do `/remover`:**
+1. Usuário digita: `/remover data:2026-08-22 url:https://ge.globo.com/...`
+2. Bot responde imediatamente "Removendo notícia..." (deferred)
+3. Em background: adiciona URL ao blocklist.json, remove item do MDX, faz git commit + push
+4. Edita mensagem: "✅ Notícia removida com sucesso!"
+
+**Pacotes necessários:** `discord-api-types`, `discord-interactions`
+
+**Variáveis de ambiente (Vercel):**
+- `DISCORD_APPLICATION_ID`
+- `DISCORD_PUBLIC_KEY`
+- `DISCORD_BOT_TOKEN`
+
+**Arquivos a criar:**
+- `src/app/api/discord/interactions/route.ts`
+- `src/lib/discord/verify.ts`
+- `src/lib/discord/commands.ts`
+- `src/scripts/register-discord-commands.ts`
+
+**Setup inicial (1x):**
+1. Criar Discord Application em https://discord.com/developers/applications
+2. Copiar Application ID, Public Key, Bot Token
+3. Configurar variáveis no Vercel Dashboard
+4. Rodar `npm run scripts:register-discord`
+5. Colocar URL do endpoint no Developer Portal
+6. Convidar bot para o servidor Discord
+
+**Status:** ⏳ Planejado — aguarda execução na próxima sessão
 
 ## Prioridade Média
 
