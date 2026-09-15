@@ -118,6 +118,7 @@ const EXCLUDED_URL_PATTERNS = [
   "/feminina/", "/copa-do-mundo-feminina/", "/futebol-feminino/",
   "/entretenimento/",
   "/paralimpiadas/", "/olimpiadas/", "/parapan/",
+  "/cartola/", "/maratona-aquatica/",
   "/sp/", "/rj/", "/ce/", "/rs/", "/mg/", "/ba/",
   "/pr/", "/pe/", "/sc/", "/df/", "/es/", "/go/",
   "/ac/", "/al/", "/am/", "/ap/", "/ma/", "/mt/",
@@ -138,7 +139,7 @@ const CLUBES_BRASILEIROS = [
 ];
 
 const OTHER_NATIONALITIES = [
-  "frança", "francesa", "franceses",
+  "frança", "francesa", "franceses", "frances",
   "espanha", "espanhola", "espanhóis", "espanhois",
   "argentina", "argentino", "argentinos",
   "inglaterra", "inglês", "inglesa", "ingleses",
@@ -346,9 +347,32 @@ function hasPromoAnnouncement(title: string): boolean {
   return t.includes("edição") || t.includes("edicao") || t.includes("revista");
 }
 
+function hasCBFGovernanceOrObituary(title: string, resumo: string): boolean {
+  const text = buildText(title, resumo);
+  const t = title.toLowerCase().trim();
+  const hasCbf = text.includes("cbf");
+  if (!hasCbf) return false;
+
+  const isObituary =
+    t.includes("morre") || t.includes("falece") || t.includes("falecimento") ||
+    t.includes("óbito") || t.includes("obito") || t.includes("morto") ||
+    t.includes("morta") || t.includes("velório") || t.includes("velorio") ||
+    text.includes("morreu") || text.includes("faleceu");
+  if (isObituary) return true;
+
+  const isGovernance =
+    t.includes("presidente") || t.includes("diretor") || t.includes("dirigente") ||
+    t.includes("gestão") || t.includes("gestao") || t.includes("administração") ||
+    t.includes("administracao") || t.includes("mandato") || t.includes("eleição") ||
+    t.includes("eleicao") || t.includes("refundação") || t.includes("refundacao") ||
+    t.includes("transformação") || t.includes("transformacao");
+  if (isGovernance) return true;
+
+  return false;
+}
+
 function hasWomensFootballContext(title: string, resumo: string): boolean {
   const text = buildText(title, resumo);
-  const titleLower = title.toLowerCase();
 
   const hasFigure = WOMENS_FOOTBALL_FIGURES.some((f) => text.includes(f));
   const hasContext = WOMENS_FOOTBALL_CONTEXT.some((c) => text.includes(c));
@@ -453,6 +477,7 @@ export function isRelevant(title: string, resumo?: string, url?: string): boolea
   if (hasBrazilianClubFocusOffContext(title)) return false;
   if (hasForeignStarOffContext(title, resumo ?? "")) return false;
   if (hasWomensFootballContext(title, resumo ?? "")) return false;
+  if (hasCBFGovernanceOrObituary(title, resumo ?? "")) return false;
 
   if (hasStrongSelecaoContext(text)) return true;
 
